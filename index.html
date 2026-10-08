@@ -1,0 +1,2188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
+  <title>نور الإسلام — Noor Al-Islam</title>
+  <meta name="description" content="Authentic Pakistani Indo-Pak Quran Majeed, Exact Namaz Timings, Gyroscope Qibla Compass, Hadith, Tasbih & Mosque Finder.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Amiri:ital,wght@0,400;0,700;1,400&family=Scheherazade+New:wght@400;600;700&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="assets/icon.png">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       SIDE NAVIGATION DRAWER (HAMBURGER MENU)
+       ========================================================================== -->
+  <div class="side-drawer-overlay" id="side-drawer-overlay" onclick="closeSideDrawer()">
+    <div class="side-drawer-panel" onclick="event.stopPropagation()">
+      <div class="drawer-header">
+        <img src="assets/icon.png" alt="Noor Al-Islam Logo" style="width: 58px; height: 58px; border-radius: 16px; border: 2px solid var(--gold-primary); margin-bottom: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.4);">
+        <div class="drawer-brand-title">Noor Al-Islam</div>
+        <div class="drawer-brand-sub">نور الإسلام • Authentic Islamic App</div>
+      </div>
+      <div class="drawer-nav-list">
+        <div class="drawer-nav-item" onclick="navigateTo('home'); closeSideDrawer();">
+          <span>🏠</span> <span>Home / Dashboard</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('prayer-times'); closeSideDrawer();">
+          <span>⏰</span> <span>Today's Prayer Times</span>
+        </div>
+        <div class="drawer-nav-item" onclick="openFastingDuasModal(); closeSideDrawer();">
+          <span>🌙</span> <span>Ramadan & Fasting Duas</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('quran-main'); closeSideDrawer();">
+          <span>📖</span> <span>Holy Quran (Surahs & Paras)</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('qibla'); closeSideDrawer();">
+          <span>🧭</span> <span>Qibla Direction</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('azan-alarm'); closeSideDrawer();">
+          <span>🔔</span> <span>Azan & Alarms</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('tasbih'); closeSideDrawer();">
+          <span>📿</span> <span>Digital Tasbih</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('mosques'); closeSideDrawer();">
+          <span>📍</span> <span>Nearby Mosques</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('ayat-day'); closeSideDrawer();">
+          <span>✨</span> <span>Ayat of the Day</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('hadith-day'); closeSideDrawer();">
+          <span>📜</span> <span>Hadith of the Day</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('madhab'); closeSideDrawer();">
+          <span>🕌</span> <span>Madhab Settings (Hanafi / Shafi)</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('settings'); closeSideDrawer();">
+          <span>⚙️</span> <span>Filters & Settings</span>
+        </div>
+        <div class="drawer-nav-item" onclick="openPinpointModal(); closeSideDrawer();">
+          <span>🎯</span> <span>100% Exact Building Pinpoint</span>
+        </div>
+        <div class="drawer-nav-item" onclick="openVerifiedSourcesModal(); closeSideDrawer();">
+          <span>📜</span> <span>100% Verified Sources (مستند مراجع)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- ==========================================================================
+         SCREEN 1: DASHBOARD / HOME (#view-home)
+         ========================================================================== -->
+    <main id="view-home" class="app-screen active">
+      
+      <!-- Top Green Mosque Silhouette Header -->
+      <header class="home-hero-header">
+        <div class="home-top-bar">
+          <button class="header-icon-btn" onclick="openSideDrawer()" title="Open Side Menu">
+            <span>☰</span>
+          </button>
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <button class="header-icon-btn" onclick="navigateTo('quran-search')" title="Search Quran, Ayats & Duas">
+              <span>🔍</span>
+            </button>
+            <button class="header-icon-btn" onclick="openPinpointModal()" title="100% Exact Building Pinpoint">
+              <span>📍</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="home-greeting-greeting">Assalamu Alaikum</div>
+        <div class="home-greeting-title" id="home-greeting-title">Good Morning</div>
+        <div class="home-greeting-sub">May Allah accept your good deeds.</div>
+
+        <div class="home-location-pill" onclick="openPinpointModal()" title="Tap to detect exact building">
+          <span>📍</span>
+          <span class="loc-name" id="home-location-name">Karachi, Pakistan</span>
+          <span style="font-size: 0.7rem; opacity: 0.8;">▾</span>
+        </div>
+      </header>
+
+      <!-- Dual Cards (Current Time + Next Azan) -->
+      <section class="home-dual-cards-row">
+        <!-- Current Time Card -->
+        <div class="time-hero-card" onclick="navigateTo('clock-hero')">
+          <div class="time-hero-label">Current Time</div>
+          <div class="time-hero-val" id="home-current-time-val">10:24 AM</div>
+          <div class="time-hero-date" id="home-current-date-val">Fri, 25 Apr 2025</div>
+        </div>
+
+        <!-- Next Azan Card -->
+        <div class="azan-hero-card" onclick="navigateTo('prayer-times')">
+          <div class="azan-hero-top">
+            <span class="azan-hero-label">Next Azan</span>
+            <div class="azan-hero-bell" onclick="event.stopPropagation(); playAzanPreview();" title="Preview Azan Sound">🔔</div>
+          </div>
+          <div class="azan-hero-name" id="home-next-azan-name">Dhuhr</div>
+          <div class="azan-hero-time" id="home-next-azan-time">12:45 PM</div>
+          <div class="azan-hero-left" id="home-next-azan-remaining">2h 21m left</div>
+        </div>
+      </section>
+
+      <!-- Quick Action Grid (1-Tap Direct Navigation) -->
+      <section class="home-quick-actions-grid">
+        <div class="quick-action-tile" onclick="navigateTo('quran-main')">
+          <div class="quick-action-icon">📖</div>
+          <div class="quick-action-title">Quran</div>
+        </div>
+        <div class="quick-action-tile" onclick="navigateTo('qibla')">
+          <div class="quick-action-icon">🧭</div>
+          <div class="quick-action-title">Qibla</div>
+        </div>
+        <div class="quick-action-tile" onclick="navigateTo('azan-alarm')">
+          <div class="quick-action-icon">🔔</div>
+          <div class="quick-action-title">Azan</div>
+        </div>
+        <div class="quick-action-tile" onclick="navigateTo('prayer-times')">
+          <div class="quick-action-icon">⏰</div>
+          <div class="quick-action-title">Timings</div>
+        </div>
+        <div class="quick-action-tile" onclick="openFastingDuasModal()">
+          <div class="quick-action-icon">🌙</div>
+          <div class="quick-action-title">Duas</div>
+        </div>
+        <div class="quick-action-tile" onclick="navigateTo('tasbih')">
+          <div class="quick-action-icon">📿</div>
+          <div class="quick-action-title">Tasbih</div>
+        </div>
+        <div class="quick-action-tile" onclick="navigateTo('mosques')">
+          <div class="quick-action-icon">📍</div>
+          <div class="quick-action-title">Mosques</div>
+        </div>
+        <div class="quick-action-tile" onclick="navigateTo('more')">
+          <div class="quick-action-icon">✨</div>
+          <div class="quick-action-title">More</div>
+        </div>
+      </section>
+
+      <!-- Prayer Times Row -->
+      <section class="home-section-header">
+        <div class="home-section-title">
+          <span>Prayer Times</span>
+          <span class="urdu-title-badge" dir="rtl">(نماز کے اوقات)</span>
+        </div>
+        <div class="home-section-link" onclick="navigateTo('prayer-times')">
+          <span>View All</span> <span>&gt;</span>
+        </div>
+      </section>
+
+      <section class="prayer-pills-row" id="home-prayer-pills-row">
+        <div class="prayer-pill-card" id="pill-fajr" onclick="navigateTo('prayer-times')">
+          <div class="prayer-pill-icon">🌅</div>
+          <div class="prayer-pill-name">Fajr</div>
+          <div class="prayer-pill-time" id="pill-time-fajr">05:12 AM</div>
+        </div>
+        <div class="prayer-pill-card active" id="pill-dhuhr" onclick="navigateTo('prayer-times')">
+          <div class="prayer-pill-icon">☀️</div>
+          <div class="prayer-pill-name">Dhuhr</div>
+          <div class="prayer-pill-time" id="pill-time-dhuhr">12:45 PM</div>
+        </div>
+        <div class="prayer-pill-card" id="pill-asr" onclick="navigateTo('prayer-times')">
+          <div class="prayer-pill-icon">🌤️</div>
+          <div class="prayer-pill-name">Asr</div>
+          <div class="prayer-pill-time" id="pill-time-asr">04:32 PM</div>
+        </div>
+        <div class="prayer-pill-card" id="pill-maghrib" onclick="navigateTo('prayer-times')">
+          <div class="prayer-pill-icon">🌇</div>
+          <div class="prayer-pill-name">Maghrib</div>
+          <div class="prayer-pill-time" id="pill-time-maghrib">06:58 PM</div>
+        </div>
+        <div class="prayer-pill-card" id="pill-isha" onclick="navigateTo('prayer-times')">
+          <div class="prayer-pill-icon">🌙</div>
+          <div class="prayer-pill-name">Isha</div>
+          <div class="prayer-pill-time" id="pill-time-isha">08:20 PM</div>
+        </div>
+      </section>
+
+      <!-- Daily Inspiration Section: Arabic -> Urdu -> English -->
+      <section class="home-inspiration-container">
+        <div class="home-section-header" style="padding: 0; margin-bottom: 0.6rem;">
+          <div class="home-section-title">
+            <span>Daily Inspiration</span>
+            <span class="urdu-title-badge" dir="rtl">(آج کی آیت اور حدیث)</span>
+          </div>
+          <div class="home-section-link" onclick="testInspirationNotification('ayat')">
+            <span>🔔 Daily Alert</span>
+          </div>
+        </div>
+
+        <!-- Ayat Card -->
+        <div class="home-insp-card">
+          <div class="insp-header-tag">
+            <span class="insp-title-badge">✨ Ayat of the Day</span>
+            <span class="insp-ref-pill" id="home-ayat-ref">[Al-Baqarah 2:45]</span>
+          </div>
+          <div class="home-insp-arabic" id="home-ayat-arabic" dir="rtl">
+            وَاسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ ۚ وَإِنَّهَا لَكَبِيرَةٌ إِلَّا عَلَى الْخَاشِعِينَ
+          </div>
+          <div class="home-insp-urdu" id="home-ayat-urdu" dir="rtl">
+            اور صبر اور نماز کے ساتھ مدد چاہو اور بیشک یہ ضرور بھاری ہے مگر ان پر جو عاجزی کرنے والے ہیں
+          </div>
+          <div class="home-insp-english" id="home-ayat-english" dir="ltr">
+            And seek help through patience and prayer. Indeed, it is hard except for the humbly submissive [to Allah].
+          </div>
+          <div class="insp-actions-row">
+            <button class="insp-btn-subtle" onclick="navigateTo('ayat-day')">
+              <span>Read Full Card</span> <span>➔</span>
+            </button>
+            <button class="insp-btn-subtle" onclick="testInspirationNotification('ayat')">
+              <span>🔔 Send Notification</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hadith Card -->
+        <div class="home-insp-card" style="margin-top: 0.75rem;">
+          <div class="insp-header-tag">
+            <span class="insp-title-badge">📜 Hadith of the Day</span>
+            <span class="insp-ref-pill" id="home-hadith-ref">[Sahih Al-Bukhari]</span>
+          </div>
+          <div class="home-insp-arabic" id="home-hadith-arabic" dir="rtl">
+            إِنَّ مِنْ خِيَارِكُمْ أَحْسَنَكُمْ أَخْلَاقًا
+          </div>
+          <div class="home-insp-urdu" id="home-hadith-urdu" dir="rtl">
+            تم میں سب سے بہتر وہ ہے جس کے اخلاق سب سے اچھے ہیں
+          </div>
+          <div class="home-insp-english" id="home-hadith-english" dir="ltr">
+            The best among you are those who have the best manners and character.
+          </div>
+          <div class="insp-actions-row">
+            <button class="insp-btn-subtle" onclick="navigateTo('hadith-day')">
+              <span>Read Full Card</span> <span>➔</span>
+            </button>
+            <button class="insp-btn-subtle" onclick="testInspirationNotification('hadith')">
+              <span>🔔 Send Notification</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           RESUME QURAN READING QUICK CARD (DASHBOARD)
+           ====================================================================== -->
+      <section class="bookmark-resume-card" id="home-resume-quran-card" style="margin-top: 1.25rem; cursor: pointer;" onclick="resumeLastReadQuran()">
+        <div class="bookmark-resume-info">
+          <span class="bookmark-resume-badge">📖 Resume Quran <span class="urdu-title-badge" dir="rtl">(آخری تلاوت)</span></span>
+          <span class="bookmark-resume-title" id="home-resume-surah-title">Surah Al-Fatihah</span>
+          <span class="bookmark-resume-meta" id="home-resume-ayah-meta">Ayah 1 • Tap to continue reading</span>
+        </div>
+        <button class="btn-resume-jump" onclick="event.stopPropagation(); resumeLastReadQuran();">
+          <span>▶</span> <span>Resume</span>
+        </button>
+      </section>
+
+      <!-- Hidden on main page per user request (moved to More -> Ramadan Calendar) -->
+      <section class="home-ramadan-card" id="home-ramadan-card-section" style="display: none;">
+        <div class="ramadan-card-header">
+          <span class="ramadan-card-badge">🌙 Ramadan & Daily Fasting</span>
+          <span class="ramadan-card-title">سحری اور افطاری کے اوقات</span>
+        </div>
+        <div class="ramadan-times-grid">
+          <div class="ramadan-time-box">
+            <div class="ramadan-time-label">
+              <span>🌅</span> <span>Sehri Ends</span>
+            </div>
+            <div class="ramadan-time-val" id="home-sehri-time">04:45 AM</div>
+          </div>
+          <div class="ramadan-time-box">
+            <div class="ramadan-time-label">
+              <span>🌇</span> <span>Iftar Time</span>
+            </div>
+            <div class="ramadan-time-val" id="home-iftar-time">06:58 PM</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ==========================================================================
+         SCREEN 2: PRAYER TIMES (#view-prayer-times)
+         ========================================================================== -->
+    <section id="view-prayer-times" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Prayer Times</div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="navigateTo('madhab')">⚙️</button>
+        </div>
+      </header>
+
+      <div class="pt-content">
+        <!-- Location & Date Card -->
+        <div class="pt-meta-card">
+          <div class="pt-meta-loc">
+            <span>📍</span> <span id="pt-screen-loc">Karachi, Pakistan</span>
+          </div>
+          <div class="pt-meta-date" id="pt-screen-date">Friday, 25 April 2025</div>
+        </div>
+
+        <!-- Next Azan Highlight Card -->
+        <div class="pt-next-highlight-card">
+          <div class="pt-next-left">
+            <div class="next-tag">Next Azan</div>
+            <div class="next-name-val" id="pt-highlight-name">Dhuhr 12:45 PM</div>
+          </div>
+          <button class="pt-next-bell-btn" onclick="playAzanPreview()" title="Preview Sound">🔔</button>
+        </div>
+
+        <!-- Today's Prayer Times List -->
+        <div class="pt-list-container">
+          <div class="pt-list-header">Today's Prayer Times</div>
+
+          <div class="pt-row-item" id="pt-row-fajr">
+            <div class="pt-row-left">
+              <span class="pt-row-icon">🌅</span>
+              <span class="pt-row-name">Fajr</span>
+            </div>
+            <span class="pt-row-time" id="pt-time-fajr">05:12 AM</span>
+          </div>
+
+          <div class="pt-row-item" id="pt-row-sunrise">
+            <div class="pt-row-left">
+              <span class="pt-row-icon">☀️</span>
+              <span class="pt-row-name">Sunrise</span>
+            </div>
+            <span class="pt-row-time" id="pt-time-sunrise">06:24 AM</span>
+          </div>
+
+          <div class="pt-row-item active-now" id="pt-row-dhuhr">
+            <div class="pt-row-left">
+              <span class="pt-row-icon">🟢</span>
+              <span class="pt-row-name">Dhuhr</span>
+            </div>
+            <span class="pt-row-time" id="pt-time-dhuhr">12:45 PM</span>
+          </div>
+
+          <div class="pt-row-item" id="pt-row-asr">
+            <div class="pt-row-left">
+              <span class="pt-row-icon">🌤️</span>
+              <span class="pt-row-name">Asr</span>
+            </div>
+            <span class="pt-row-time" id="pt-time-asr">04:32 PM</span>
+          </div>
+
+          <div class="pt-row-item" id="pt-row-maghrib">
+            <div class="pt-row-left">
+              <span class="pt-row-icon">🌇</span>
+              <span class="pt-row-name">Maghrib</span>
+            </div>
+            <span class="pt-row-time" id="pt-time-maghrib">06:58 PM</span>
+          </div>
+
+          <div class="pt-row-item" id="pt-row-isha">
+            <div class="pt-row-left">
+              <span class="pt-row-icon">🌙</span>
+              <span class="pt-row-name">Isha</span>
+            </div>
+            <span class="pt-row-time" id="pt-time-isha">08:20 PM</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 3: MADHAB SETTINGS (#view-madhab)
+         ========================================================================== -->
+    <section id="view-madhab" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Madhab Settings</div>
+        <div class="header-right"></div>
+      </header>
+
+      <div class="madhab-content">
+        <div class="madhab-toggle-row">
+          <button class="madhab-pill-btn active" id="btn-madhab-hanafi" onclick="setMadhabPreference('hanafi')">
+            <span>🕌</span> <span>Hanafi</span>
+          </button>
+          <button class="madhab-pill-btn" id="btn-madhab-shafi" onclick="setMadhabPreference('shafi')">
+            <span>🕌</span> <span>Shafi</span>
+          </button>
+        </div>
+
+        <p class="madhab-desc-note">
+          Choose your preferred madhab for accurate prayer times and Islamic rulings. Hanafi Asr starts later when shadow is twice the length; Shafi / Hanbali / Maliki Asr starts when shadow equals the length.
+        </p>
+
+        <div class="settings-list-card">
+          <div class="settings-nav-item" onclick="navigateTo('prayer-times')">
+            <span>⏰ Prayer Times</span>
+            <span class="chevron">&gt;</span>
+          </div>
+          <div class="settings-nav-item" onclick="navigateTo('qibla')">
+            <span>🧭 Qibla Direction</span>
+            <span class="chevron">&gt;</span>
+          </div>
+          <div class="settings-nav-item" onclick="navigateTo('settings')">
+            <span>⚖️ Fiqh Rulings</span>
+            <span class="chevron">&gt;</span>
+          </div>
+          <div class="settings-nav-item" onclick="openFastingDuasModal()">
+            <span>🤲 Duas & Supplications</span>
+            <span class="chevron">&gt;</span>
+          </div>
+          <div class="settings-nav-item" onclick="navigateTo('clock-hero')">
+            <span>📅 Islamic Calendar</span>
+            <span class="chevron">&gt;</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 4: FILTERS & SETTINGS (#view-settings)
+         ========================================================================== -->
+    <section id="view-settings" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Filters & Settings</div>
+        <div class="header-right"></div>
+      </header>
+
+      <div class="settings-page-content">
+        <!-- Quran Reading Group -->
+        <div>
+          <div class="settings-group-title">Quran Reading</div>
+          <div class="settings-card">
+            <div class="settings-row" onclick="openQuranOptionsModal()">
+              <span class="settings-row-label">📖 Translation</span>
+              <span class="settings-row-val" id="settings-current-trans">English &gt;</span>
+            </div>
+            <div class="settings-row" onclick="openQuranOptionsModal()">
+              <span class="settings-row-label">📚 Tafsir</span>
+              <span class="settings-row-val">Select Tafsir &gt;</span>
+            </div>
+            <div class="settings-row">
+              <span class="settings-row-label">🔊 Audio Recitation</span>
+              <label class="switch">
+                <input type="checkbox" id="toggle-audio-recitation" checked onchange="saveAppSetting('audioRecitation', this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div>
+          <div class="settings-group-title">Search</div>
+          <div class="quran-search-bar" style="margin-bottom:0;" onclick="navigateTo('quran-search')">
+            <span>🔍</span>
+            <input type="text" placeholder="Search surah, juz, para..." readonly>
+          </div>
+        </div>
+
+        <!-- Audio Settings Group -->
+        <div>
+          <div class="settings-group-title">Audio Settings</div>
+          <div class="settings-card">
+            <div class="settings-row">
+              <span class="settings-row-label">▶️ Auto Play</span>
+              <label class="switch">
+                <input type="checkbox" id="toggle-audio-autoplay" checked onchange="saveAppSetting('autoPlay', this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="settings-row" onclick="openQuranOptionsModal()">
+              <span class="settings-row-label">🔁 Repeat</span>
+              <span class="settings-row-val">None &gt;</span>
+            </div>
+            <div class="settings-row" onclick="openQuranOptionsModal()">
+              <span class="settings-row-label">🎙️ Reciter</span>
+              <span class="settings-row-val" id="settings-current-reciter">Mishary Rashid Alafasy &gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- App Settings Group -->
+        <div>
+          <div class="settings-group-title">App Settings</div>
+          <div class="settings-card">
+            <div class="settings-row" onclick="toggleAppTheme()">
+              <span class="settings-row-label">🎨 Theme</span>
+              <span class="settings-row-val" id="settings-current-theme">Light &gt;</span>
+            </div>
+            <div class="settings-row" onclick="openPinpointModal()">
+              <span class="settings-row-label">🎯 Building / GPS Pinpoint</span>
+              <span class="settings-row-val">Accurate &gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Authenticity & Notification Group -->
+        <div>
+          <div class="settings-group-title">Authenticity & Daily Reminders</div>
+          <div class="settings-card">
+            <div class="settings-row" onclick="openVerifiedSourcesModal()">
+              <span class="settings-row-label">📜 100% Authentic Sources & Proof (مستند مراجع)</span>
+              <span class="settings-row-val">Verified &gt;</span>
+            </div>
+            <div class="settings-row" onclick="triggerTasbihReminderNow()">
+              <span class="settings-row-label">🔔 Test Daily Notification Sound (چائم و آواز)</span>
+              <span class="settings-row-val">Play Sound &gt;</span>
+            </div>
+            <div class="settings-row" onclick="testInspirationNotification('hadith')">
+              <span class="settings-row-label">📜 Test Daily Hadith Notification Sound</span>
+              <span class="settings-row-val">Send Alert &gt;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 5: CURRENT TIME + NEXT AZAN (CLOCK HERO) (#view-clock-hero)
+         ========================================================================== -->
+    <section id="view-clock-hero" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Home / Clock</div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="openPinpointModal()">📍</button>
+        </div>
+      </header>
+
+      <div class="clock-hero-content">
+        <!-- Giant Digital Clock -->
+        <div class="giant-clock-card">
+          <div class="giant-clock-time" id="giant-clock-display">10:24 AM</div>
+          <div class="giant-clock-date" id="giant-clock-date">Fri, 25 Apr 2025</div>
+        </div>
+
+        <!-- Next Azan Banner -->
+        <div class="pt-next-highlight-card" onclick="navigateTo('prayer-times')">
+          <div class="pt-next-left">
+            <div class="next-tag">Next Azan</div>
+            <div class="next-name-val" id="clock-hero-next-azan">Dhuhr 12:45 PM</div>
+          </div>
+          <div style="font-size: 0.9rem; color: var(--gold-light); font-weight:700;" id="clock-hero-time-left">2h 21m left</div>
+        </div>
+
+        <!-- Wisdom Quote Banner -->
+        <div class="wisdom-banner-card">
+          <div class="wisdom-banner-text">"Keep your prayers and you will be successful."</div>
+          <div class="wisdom-banner-ref">[Quran 23:1]</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 6: AYAT OF THE DAY (#view-ayat-day)
+         ========================================================================== -->
+    <section id="view-ayat-day" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Ayat of the Day</div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="shareCurrentAyat()">🔗</button>
+        </div>
+      </header>
+
+      <div class="arch-card-wrapper">
+        <div class="islamic-arch-card">
+          <div class="arch-ornament-top">🕌</div>
+          <div class="arch-arabic-text" id="ayat-screen-arabic" dir="rtl">
+            وَاسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ ۚ وَإِنَّهَا لَكَبِيرَةٌ إِلَّا عَلَى الْخَاشِعِينَ
+          </div>
+          <div class="arch-urdu-text" id="ayat-screen-urdu" dir="rtl">
+            اور صبر اور نماز کے ساتھ مدد چاہو اور بیشک یہ ضرور بھاری ہے مگر ان پر جو عاجزی کرنے والے ہیں
+          </div>
+          <div class="arch-trans-text" id="ayat-screen-english" dir="ltr">
+            And seek help through patience and prayer. Indeed, it is hard except for the humbly submissive [to Allah].
+          </div>
+          <div class="arch-ref-tag" id="ayat-screen-ref">[Al-Baqarah 2:45]</div>
+        </div>
+
+        <div class="arch-btn-group">
+          <button class="btn-arch-outline" onclick="shareCurrentAyat()">
+            <span>🔗</span> <span>Share</span>
+          </button>
+          <button class="btn-arch-solid" onclick="loadNextAyatOfDay()">
+            <span>Next Ayat</span> <span>➔</span>
+          </button>
+        </div>
+
+        <button class="btn-arch-outline" style="margin-top:0.75rem; width:100%; justify-content:center; border-radius:14px; font-weight:700;" onclick="testInspirationNotification('ayat')">
+          <span>🔔</span> <span>Send Ayat Notification to Phone</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 7: HADITH OF THE DAY & AUTHENTIC HADITH COLLECTION (#view-hadith-day)
+         ========================================================================== -->
+    <section id="view-hadith-day" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Hadith Explorer <span class="urdu-title-badge" dir="rtl">(احادیث مبارکہ)</span></div>
+        <div class="header-right" style="display:flex; gap:0.4rem;">
+          <button class="header-icon-btn" onclick="openVerifiedSourcesModal()" title="100% Authentic Sources Proof">📜</button>
+          <button class="header-icon-btn" onclick="shareCurrentHadith()">🔗</button>
+        </div>
+      </header>
+
+      <div class="hadith-explorer-wrapper">
+        <!-- 100% Verified Kutub al-Sittah banner -->
+        <div onclick="openVerifiedSourcesModal()" style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); border-radius:10px; padding:0.45rem 0.85rem; margin-bottom:1rem; display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
+          <span style="font-size:0.75rem; color:var(--emerald-primary); font-weight:700;">✓ 100% Authentic Kutub al-Sittah (الكتب الستة)</span>
+          <span style="font-size:0.72rem; color:var(--text-muted); font-weight:600;">Check Proof ➔</span>
+        </div>
+
+        <!-- Hadith of the Day Featured Card -->
+        <div class="islamic-arch-card" style="margin-bottom:1.25rem;">
+          <div class="arch-ornament-top">📜</div>
+          <div class="insp-title-badge" style="margin-bottom:0.6rem;">✨ Hadith of the Day <span class="urdu-title-badge" dir="rtl">(آج کی منتخب حدیث)</span></div>
+          <div class="arch-arabic-text" id="hadith-screen-arabic" dir="rtl">
+            إِنَّ مِنْ خِيَارِكُمْ أَحْسَنَكُمْ أَخْلَاقًا
+          </div>
+          <div class="arch-urdu-text" id="hadith-screen-urdu" dir="rtl">
+            تم میں سب سے بہتر وہ ہے جس کے اخلاق سب سے اچھے ہیں
+          </div>
+          <div class="arch-trans-text" id="hadith-screen-english" dir="ltr">
+            The best among you are those who have the best manners and character.
+          </div>
+          <div class="arch-ref-tag" id="hadith-screen-ref">[Sahih Al-Bukhari 6035]</div>
+
+          <div class="arch-btn-group" style="margin-top:1rem;">
+            <button class="btn-arch-outline" onclick="shareCurrentHadith()">
+              <span>🔗</span> <span>Share</span>
+            </button>
+            <button class="btn-arch-solid" onclick="loadNextHadithOfDay()">
+              <span>Next Hadith</span> <span>➔</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hadith Search & Category Filters -->
+        <div class="hadith-search-section">
+          <div class="home-section-title" style="margin-bottom:0.6rem;">
+            <span>Search Hadith Collection</span>
+            <span class="urdu-title-badge" dir="rtl">(احادیث تلاش کریں)</span>
+          </div>
+
+          <div class="quran-search-bar" style="margin-bottom:0.75rem;">
+            <span>🔍</span>
+            <input type="text" id="hadith-search-input" placeholder="Search Hadith (parents, bukhari, prayer, والدین, اخلاق)..." oninput="onHadithSearchInput(this.value)">
+          </div>
+
+          <div class="hadith-category-pills" style="display:flex; gap:0.4rem; overflow-x:auto; padding-bottom:0.5rem; margin-bottom:1rem;">
+            <button class="sound-pill active" id="hadith-tab-all" onclick="filterHadithCategory('all')">All (سب)</button>
+            <button class="sound-pill" id="hadith-tab-astaghfar" onclick="filterHadithCategory('astaghfar')">🤲 Astaghfar & Tawbah (استغفار)</button>
+            <button class="sound-pill" id="hadith-tab-prayer" onclick="filterHadithCategory('prayer')">🕌 Salah & Taharah (نماز و طہارت)</button>
+            <button class="sound-pill" id="hadith-tab-quran" onclick="filterHadithCategory('quran')">📖 Quran Virtues (فضائل قرآن)</button>
+            <button class="sound-pill" id="hadith-tab-ramadan" onclick="filterHadithCategory('ramadan')">🌙 Fasting & Ramadan (روزہ)</button>
+            <button class="sound-pill" id="hadith-tab-hajj" onclick="filterHadithCategory('hajj')">🕋 Hajj & Umrah (حج و عمرہ)</button>
+            <button class="sound-pill" id="hadith-tab-parents" onclick="filterHadithCategory('parents')">👨‍👩‍👧 Parents & Kin (والدین)</button>
+            <button class="sound-pill" id="hadith-tab-manners" onclick="filterHadithCategory('manners')">✨ Good Character (اخلاق)</button>
+            <button class="sound-pill" id="hadith-tab-charity" onclick="filterHadithCategory('charity')">🤝 Charity (صدقہ)</button>
+            <button class="sound-pill" id="hadith-tab-zikr" onclick="filterHadithCategory('zikr')">📿 Zikr & Dua (ذکر و دعا)</button>
+            <button class="sound-pill" id="hadith-tab-bukhari" onclick="filterHadithCategory('bukhari')">📖 Sahih Bukhari (بخاری)</button>
+            <button class="sound-pill" id="hadith-tab-muslim" onclick="filterHadithCategory('muslim')">📜 Sahih Muslim (مسلم)</button>
+          </div>
+        </div>
+
+        <!-- Filtered Hadith List Container -->
+        <div id="hadith-collection-list" class="hadith-collection-list"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 8: HOLY QURAN - MAIN (#view-quran-main)
+         ========================================================================== -->
+    <section id="view-quran-main" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="openSideDrawer()">☰</button>
+        </div>
+        <div class="header-title">Holy Quran</div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="openQuranOptionsModal()">⚙️</button>
+        </div>
+      </header>
+
+      <div class="quran-main-header-area">
+        <div class="quran-search-bar">
+          <span>🔍</span>
+          <input type="text" id="quran-search-input" placeholder="Search surah, meaning..." oninput="onQuranSearchInput(this.value)">
+        </div>
+
+        <div class="quran-tabs-row">
+          <button class="quran-tab-btn active" id="tab-btn-surah" onclick="switchQuranTab('surah')">Surah</button>
+          <button class="quran-tab-btn" id="tab-btn-juz" onclick="switchQuranTab('juz')">Juz / Para</button>
+          <button class="quran-tab-btn" id="tab-btn-bookmarks" onclick="switchQuranTab('bookmarks')">Bookmarks</button>
+        </div>
+      </div>
+
+      <!-- Surah List Container -->
+      <div class="quran-list-container" id="surah-selection-list"></div>
+
+      <!-- Para / Juz List Container -->
+      <div class="quran-list-container" id="quran-juz-selection-grid" style="display:none;"></div>
+
+      <!-- Bookmarks & Resume Reading Container -->
+      <div class="quran-list-container" id="quran-bookmarks-container" style="display:none; flex-direction:column; gap:0.85rem; padding-bottom:calc(var(--nav-height) + 40px);"></div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 9: SURAH / PARA READER (#view-surah-reader)
+         ========================================================================== -->
+    <section id="view-surah-reader" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title" id="reader-header-title">Al-Fatiha</div>
+        <div class="header-right" style="display:flex; align-items:center; gap:0.4rem;">
+          <button class="header-audio-play-pill" id="reader-header-audio-btn" onclick="toggleQuranPlayback()" title="Listen to Surah">
+            <span id="reader-header-audio-icon">▶</span>
+            <span>Listen</span>
+          </button>
+          <button class="header-icon-btn" onclick="openQuranOptionsModal()">⚙️</button>
+        </div>
+      </header>
+
+      <!-- Surah Islamic Header Card matching reference screenshot 2 -->
+      <div class="reader-surah-header-card" id="reader-surah-header-card" style="margin: 0.85rem 1rem 0.5rem 1rem; background: linear-gradient(135deg, #0e3e2f 0%, #08291f 100%); border-radius: 18px; padding: 1.15rem 1.25rem; color: #ffffff; box-shadow: 0 6px 20px rgba(14,62,47,0.25); border: 1.5px solid rgba(212,175,55,0.4);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem;">
+          <div>
+            <div style="font-family: var(--font-arabic); font-size: 2.1rem; color: #fdfbf7; line-height: 1.2;" id="reader-card-surah-ar">الْفَاتِحَة</div>
+            <div style="font-size: 0.82rem; opacity: 0.85; margin-top: 0.25rem;" id="reader-card-surah-en">The Opening • Meccan</div>
+          </div>
+          <div style="text-align: right; background: rgba(255,255,255,0.1); padding: 0.35rem 0.75rem; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3);">
+            <div style="font-size: 1.3rem;">🕌</div>
+            <div style="font-size: 0.72rem; font-weight: 800; color: #fef08a;" id="reader-card-total-ayahs">Ayaat : 7</div>
+          </div>
+        </div>
+        <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 0.85rem; text-align: center; border: 1px solid rgba(212,175,55,0.2);">
+          <div style="font-family: var(--font-arabic); font-size: 1.55rem; color: #fef08a; margin-bottom: 0.35rem; direction: rtl;" id="reader-bismillah-banner">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
+          <div style="font-family: var(--font-urdu); font-size: 0.95rem; color: #e2e8e2; direction: rtl; line-height: 1.6;">شروع کرتا ہوں اللہ تعالیٰ کے نام سے جو بڑا مہربان نہایت رحم والا ہے ۔</div>
+        </div>
+      </div>
+
+      <!-- Quick Arabic Font Size Zoom Toolbar -->
+      <div class="reader-font-controls-bar">
+        <div class="font-controls-left">
+          <span>🔤</span> <span>Arabic Font Size</span>
+        </div>
+        <div class="font-controls-right">
+          <button class="btn-font-zoom" onclick="changeQuranFontSize(-0.15)" title="Smaller text">A−</button>
+          <span class="font-zoom-indicator" id="quran-font-size-indicator">100%</span>
+          <button class="btn-font-zoom" onclick="changeQuranFontSize(0.15)" title="Larger text">A+</button>
+        </div>
+      </div>
+
+      <!-- Verses Container -->
+      <div class="reader-verses-list" id="quran-verses-container"></div>
+
+      <!-- Sticky Floating Audio & Auto-Scroll Bar -->
+      <div class="reader-audio-bar">
+        <div class="audio-scrubber-row">
+          <span id="audio-time-current">0:00</span>
+          <input type="range" class="audio-scrubber-slider" id="quran-audio-slider" min="0" max="100" value="0">
+          <span id="audio-time-total">0:00</span>
+        </div>
+        <div class="audio-controls-row">
+          <button class="btn-autoscroll" id="btn-quran-autoscroll" onclick="toggleQuranAutoScroll()" title="Auto Scroll Quran">
+            <span class="autoscroll-icon">︾</span>
+            <span class="autoscroll-text">Auto Scroll</span>
+          </button>
+          
+          <button class="player-center-play-circle" id="btn-toggle-quran-audio" onclick="toggleQuranPlayback()" title="Play / Pause Audio">
+            <span id="quran-play-btn-icon">▶</span>
+          </button>
+
+          <div class="audio-reciter-info">
+            <div class="reciter-title" id="reader-now-reciting">Mishary Rashid Alafasy</div>
+            <div class="audio-surah-indicator" id="reader-now-surah">Surah Al-Fatihah</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 11: SEARCH IN QURAN (#view-quran-search)
+         ========================================================================== -->
+    <section id="view-quran-search" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Search</div>
+        <div class="header-right"></div>
+      </header>
+
+      <div style="padding: 1rem;">
+        <div class="quran-search-bar" style="margin-bottom:0.75rem;">
+          <span>🔍</span>
+          <input type="text" id="full-search-input" placeholder="Search surah, ayat, juz, para..." oninput="onFullSearchInput(this.value)">
+        </div>
+
+        <div style="display:flex; gap:0.4rem; overflow-x:auto; margin-bottom:1rem;">
+          <button class="sound-pill active" onclick="setSearchFilter('all')">All</button>
+          <button class="sound-pill" onclick="setSearchFilter('surah')">Surah</button>
+          <button class="sound-pill" onclick="setSearchFilter('ayat')">Ayat</button>
+          <button class="sound-pill" onclick="setSearchFilter('juz')">Juz</button>
+          <button class="sound-pill" onclick="setSearchFilter('para')">Para</button>
+        </div>
+
+        <div id="full-search-results-list" style="display:flex; flex-direction:column; gap:0.6rem;"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 12: QURAN AUDIO PLAYER (#view-quran-player)
+         ========================================================================== -->
+    <section id="view-quran-player" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Now Playing</div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="navigateTo('quran-main')">📑</button>
+        </div>
+      </header>
+
+      <div class="player-page-content">
+        <div class="player-album-art">
+          <div style="font-size:3.5rem;">📖</div>
+          <div class="surah-title-large" id="player-screen-surah">Al-Fatiha</div>
+        </div>
+
+        <div class="player-title-box">
+          <div class="player-surah-name" id="player-screen-title">Surah Al-Fatiha</div>
+          <div class="player-reciter-name" id="player-screen-reciter">Mishary Rashid Alafasy</div>
+        </div>
+
+        <div class="player-slider-box">
+          <input type="range" class="audio-scrubber-slider" id="player-full-slider" min="0" max="100" value="0" style="width:100%;">
+          <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted); margin-top:0.3rem;">
+            <span id="player-time-current">0:46</span>
+            <span id="player-time-total">2:10</span>
+          </div>
+        </div>
+
+        <div class="player-controls-buttons">
+          <button class="header-icon-btn" style="color:var(--text-secondary); font-size:1.4rem;">🔀</button>
+          <button class="header-icon-btn" style="color:var(--text-primary); font-size:1.6rem;" onclick="playPreviousSurah()">⏮</button>
+          <button class="player-main-play-btn" id="player-central-btn" onclick="toggleQuranPlayback()">▶</button>
+          <button class="header-icon-btn" style="color:var(--text-primary); font-size:1.6rem;" onclick="playNextSurah()">⏭</button>
+          <button class="header-icon-btn" style="color:var(--text-secondary); font-size:1.4rem;">🔁</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 13: QIBLA COMPASS (#view-qibla)
+         ========================================================================== -->
+    <section id="view-qibla" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Qibla Direction <span class="urdu-title-badge" dir="rtl">(قبلہ رخ)</span></div>
+        <div class="header-right" style="display:flex; align-items:center; gap:0.4rem;">
+          <button class="header-icon-btn" id="btn-compass-debug" onclick="toggleCompassDebug()" title="Sensor Diagnostics">🛠️</button>
+          <button class="header-icon-btn" onclick="calibrateCompass()" title="Calibrate Compass">🧭</button>
+        </div>
+      </header>
+
+      <div class="qibla-content">
+        <!-- Magnetic Interference / Calibration Warning Banner -->
+        <div id="qibla-calibration-warning" class="qibla-calibration-warning" style="display:none;" onclick="calibrateCompass()">
+          <span class="calib-warn-icon">⚠️</span>
+          <span class="calib-warn-text" id="qibla-calibration-warning-text">Compass needs calibration: Wave phone in a figure-8 motion</span>
+        </div>
+
+        <!-- Live Hardware Compass Diagnostics (Debug Mode) -->
+        <div id="qibla-debug-panel" class="qibla-debug-panel" style="display:none;">
+          <div class="qibla-debug-header">
+            <span>🛠️ Qibla Sensor Diagnostics</span>
+            <button class="qibla-debug-close" onclick="toggleCompassDebug()">✕</button>
+          </div>
+          <div class="qibla-debug-grid">
+            <div class="qibla-dbg-cell">
+              <span class="dbg-label">Active Sensor</span>
+              <span class="dbg-val" id="dbg-sensor-type">ROTATION_VECTOR</span>
+            </div>
+            <div class="qibla-dbg-cell">
+              <span class="dbg-label">Sensor Accuracy</span>
+              <span class="dbg-val" id="dbg-sensor-acc">High (Calibrated)</span>
+            </div>
+            <div class="qibla-dbg-cell">
+              <span class="dbg-label">GPS Latitude</span>
+              <span class="dbg-val" id="dbg-gps-lat">--</span>
+            </div>
+            <div class="qibla-dbg-cell">
+              <span class="dbg-label">GPS Longitude</span>
+              <span class="dbg-val" id="dbg-gps-lng">--</span>
+            </div>
+            <div class="qibla-dbg-cell">
+              <span class="dbg-label">GPS Accuracy</span>
+              <span class="dbg-val" id="dbg-gps-accuracy">-- m</span>
+            </div>
+            <div class="qibla-dbg-cell">
+              <span class="dbg-label">True Qibla Bearing</span>
+              <span class="dbg-val" id="dbg-qibla-bearing">--°</span>
+            </div>
+            <div class="qibla-dbg-cell">
+              <span class="dbg-label">Magnetic Heading</span>
+              <span class="dbg-val" id="dbg-mag-heading">--°</span>
+            </div>
+            <div class="qibla-dbg-cell">
+              <span class="dbg-label">Declination</span>
+              <span class="dbg-val" id="dbg-declination">--°</span>
+            </div>
+            <div class="qibla-dbg-cell">
+              <span class="dbg-label">True Heading</span>
+              <span class="dbg-val" id="dbg-true-heading">--°</span>
+            </div>
+            <div class="qibla-dbg-cell">
+              <span class="dbg-label">Relative Qibla Angle</span>
+              <span class="dbg-val" id="dbg-relative-angle">--°</span>
+            </div>
+            <div class="qibla-dbg-cell">
+              <span class="dbg-label">Mag Field (B)</span>
+              <span class="dbg-val" id="dbg-mag-field">-- µT</span>
+            </div>
+            <div class="qibla-dbg-cell">
+              <span class="dbg-label">Interference</span>
+              <span class="dbg-val" id="dbg-interference">None</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Alignment Notification Banner -->
+        <div id="qibla-alignment-banner" class="qibla-alignment-banner" style="display:none;">
+          <span class="qibla-align-pulse">🕋</span>
+          <span class="qibla-align-text">قبلہ کی سمت درست ہے • Aligned with Kaaba!</span>
+          <span class="qibla-align-stars">✨</span>
+        </div>
+
+        <div class="qibla-degree-title" id="qibla-bearing-display">Qibla 256° WSW</div>
+        <div class="qibla-status-sub" id="qibla-status-instruction">Rotate device until Kaaba pointer aligns with top</div>
+
+        <!-- 3D Luxury Islamic Compass Dial -->
+        <div class="compass-main-container" id="compass-main-container">
+          <!-- Compass Outer Bezel & Degree Ring (Rotates with -heading) -->
+          <div class="compass-outer-ring" id="compass-outer-dial">
+            <div class="compass-cardinal compass-cardinal-n">
+              <span class="cardinal-letter">N</span>
+              <span class="cardinal-ar">شمال</span>
+            </div>
+            <div class="compass-cardinal compass-cardinal-e">
+              <span class="cardinal-letter">E</span>
+              <span class="cardinal-ar">مشرق</span>
+            </div>
+            <div class="compass-cardinal compass-cardinal-s">
+              <span class="cardinal-letter">S</span>
+              <span class="cardinal-ar">جنوب</span>
+            </div>
+            <div class="compass-cardinal compass-cardinal-w">
+              <span class="cardinal-letter">W</span>
+              <span class="cardinal-ar">مغرب</span>
+            </div>
+
+            <!-- Dial ticks SVG -->
+            <svg class="compass-ticks-svg" viewBox="0 0 300 300">
+              <circle cx="150" cy="150" r="140" fill="none" stroke="rgba(212,175,55,0.25)" stroke-width="1.5" />
+              <circle cx="150" cy="150" r="130" fill="none" stroke="rgba(212,175,55,0.15)" stroke-width="1" stroke-dasharray="2,6" />
+              <!-- North needle tick on dial -->
+              <polygon points="150,14 144,32 156,32" fill="#ef4444" />
+              <polygon points="150,286 144,268 156,268" fill="rgba(255,255,255,0.4)" />
+            </svg>
+          </div>
+
+          <!-- Phone Heading Reticle (Fixed Top Marker) -->
+          <div class="compass-heading-reticle">
+            <div class="reticle-notch"></div>
+          </div>
+
+          <!-- True Kaaba Pointer (Rotates to relative Kaaba angle) -->
+          <div class="compass-qibla-needle-layer" id="compass-needle-el">
+            <div class="qibla-arrow-pointer">
+              <div class="qibla-kaaba-badge" id="compass-kaaba-badge">🕋</div>
+              <div class="qibla-needle-shaft"></div>
+            </div>
+          </div>
+
+          <!-- Geographic North Pointer (Rotates with -heading) -->
+          <div class="compass-north-needle-layer" id="compass-north-needle">
+            <div class="north-pointer-tip">▲</div>
+          </div>
+
+          <!-- Center Pivot Hub with Islamic Geometric Star -->
+          <div class="compass-center-hub">
+            <div class="hub-inner-gem"></div>
+          </div>
+        </div>
+
+        <div class="qibla-info-box">
+          <div class="qibla-info-row">
+            <span style="color:var(--text-muted);">Exact Qibla Bearing:</span>
+            <span style="font-weight:700; color:var(--emerald-primary);" id="qibla-exact-bearing">255.6° WSW</span>
+          </div>
+          <div class="qibla-info-row">
+            <span style="color:var(--text-muted);">Distance to Holy Kaaba:</span>
+            <span style="font-weight:700;" id="qibla-distance-display">3,620 km</span>
+          </div>
+          <div class="qibla-info-row">
+            <span style="color:var(--text-muted);">From your location:</span>
+            <span style="font-weight:700;" id="qibla-location-display">Islamabad, Pakistan</span>
+          </div>
+          <div class="qibla-info-row">
+            <span style="color:var(--text-muted);">Sensor Accuracy:</span>
+            <span style="font-weight:700; color:#10b981;" id="compass-sensor-status">High (Ready)</span>
+          </div>
+        </div>
+
+        <button class="btn-arch-solid" style="width:100%; border-radius:14px;" onclick="navigateTo('mosques')">
+          <span>🗺️</span> <span>Open Map & Nearby Mosques</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 14: AZAN ALARM (#view-azan-alarm)
+         ========================================================================== -->
+    <section id="view-azan-alarm" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Azan Alarm</div>
+        <div class="header-right"></div>
+      </header>
+
+      <div class="azan-alarm-content">
+        <!-- Sound Selector -->
+        <div class="alarm-sound-selector-card">
+          <div class="alarm-sound-header">Choose Azan Sound:</div>
+          <div class="alarm-sound-pills">
+            <button class="sound-pill active" id="btn-sound-makkah" onclick="selectAzanSound('makkah')">Makkah</button>
+            <button class="sound-pill" id="btn-sound-madinah" onclick="selectAzanSound('madinah')">Madinah</button>
+            <button class="sound-pill" id="btn-sound-alaqsa" onclick="selectAzanSound('alaqsa')">Al-Aqsa</button>
+            <button class="sound-pill" id="btn-sound-alafasy" onclick="selectAzanSound('alafasy')">Alafasy</button>
+          </div>
+          <button class="btn-preview-audio" onclick="playAzanPreview()">
+            <span>▶</span> <span>Preview Audio (Listen Sound)</span>
+          </button>
+        </div>
+
+        <!-- Prayer Alarm Toggles -->
+        <div class="alarm-toggles-card">
+          <div class="alarm-toggle-row">
+            <div class="alarm-toggle-left">
+              <span style="font-size:1.3rem;">🔔</span>
+              <div>
+                <div class="alarm-prayer-name">Fajr</div>
+                <div class="alarm-prayer-time" id="alarm-time-fajr">05:12 AM</div>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="alarm-toggle-fajr" checked onchange="toggleAlarmSetting('fajr', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="alarm-toggle-row">
+            <div class="alarm-toggle-left">
+              <span style="font-size:1.3rem;">🔔</span>
+              <div>
+                <div class="alarm-prayer-name">Dhuhr</div>
+                <div class="alarm-prayer-time" id="alarm-time-dhuhr">12:45 PM</div>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="alarm-toggle-dhuhr" checked onchange="toggleAlarmSetting('dhuhr', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="alarm-toggle-row">
+            <div class="alarm-toggle-left">
+              <span style="font-size:1.3rem;">🔔</span>
+              <div>
+                <div class="alarm-prayer-name">Asr</div>
+                <div class="alarm-prayer-time" id="alarm-time-asr">04:32 PM</div>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="alarm-toggle-asr" checked onchange="toggleAlarmSetting('asr', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="alarm-toggle-row">
+            <div class="alarm-toggle-left">
+              <span style="font-size:1.3rem;">🔔</span>
+              <div>
+                <div class="alarm-prayer-name">Maghrib</div>
+                <div class="alarm-prayer-time" id="alarm-time-maghrib">06:58 PM</div>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="alarm-toggle-maghrib" checked onchange="toggleAlarmSetting('maghrib', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="alarm-toggle-row">
+            <div class="alarm-toggle-left">
+              <span style="font-size:1.3rem;">🔔</span>
+              <div>
+                <div class="alarm-prayer-name">Isha</div>
+                <div class="alarm-prayer-time" id="alarm-time-isha">08:20 PM</div>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="alarm-toggle-isha" checked onchange="toggleAlarmSetting('isha', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <button class="btn-set-custom-alarm" onclick="showAppToast('All 5 Daily Alarms are actively synced with on-device AlarmManager!')">
+          Set Custom Alarm
+        </button>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 16: NEARBY MOSQUES (#view-mosques)
+         ========================================================================== -->
+    <section id="view-mosques" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Nearby Mosques</div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="refreshNearbyMosques()" title="Refresh Mosques">🔄</button>
+        </div>
+      </header>
+
+      <div class="mosques-content">
+        <!-- Interactive Radar Map -->
+        <div class="radar-map-card">
+          <div id="mosque-map-container"></div>
+        </div>
+
+        <!-- Filter Tags -->
+        <div class="mosque-filters-row">
+          <button class="mosque-filter-pill active" onclick="filterMosques('all')">All</button>
+          <button class="mosque-filter-pill" onclick="filterMosques('mosque')">Mosque</button>
+          <button class="mosque-filter-pill" onclick="filterMosques('masjid')">Masjid</button>
+          <button class="mosque-filter-pill" onclick="filterMosques('jamaat')">Jamaat</button>
+        </div>
+
+        <!-- Mosque Cards List -->
+        <div class="mosques-list-box" id="mosques-list-container"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 17: MORE FEATURES & SETTINGS (#view-more)
+         ========================================================================== -->
+    <section id="view-more" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="openSideDrawer()">☰</button>
+        </div>
+        <div class="header-title">More Features</div>
+        <div class="header-right"></div>
+      </header>
+
+      <div class="more-content">
+        <div class="more-grid-tools">
+          <div class="more-tool-card" onclick="navigateTo('ramadan-calendar')" style="border-color: rgba(212, 175, 55, 0.4); background: linear-gradient(135deg, rgba(14,62,47,0.06) 0%, rgba(212,175,55,0.06) 100%);">
+            <span class="more-tool-icon">🌙</span>
+            <span class="more-tool-title">Ramadan Calendar</span>
+            <span class="more-tool-desc">مکمل ۳۰ روزہ رمضان شیڈول مع دعائیں</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('umrah-guide')">
+            <span class="more-tool-icon">🕋</span>
+            <span class="more-tool-title">عمرہ کا طریقہ (Umrah)</span>
+            <span class="more-tool-desc">جامع و مستند طریقہ • حنفی / اہلسنت</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('hajj-guide')">
+            <span class="more-tool-icon">🕋</span>
+            <span class="more-tool-title">حج کا طریقہ (Hajj Guide)</span>
+            <span class="more-tool-desc">۸ تا ۱۲ ذوالحجہ کا مکمل شیڈول و احکام</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('verified-sources')" style="border-color: rgba(16, 185, 129, 0.4);">
+            <span class="more-tool-icon">📜</span>
+            <span class="more-tool-title">100% Verified Sources</span>
+            <span class="more-tool-desc">مصدقہ اسناد، مآخذ اور قرآنی و حدیثی ثبوت</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('tasbih')">
+            <span class="more-tool-icon">📿</span>
+            <span class="more-tool-title">Digital Tasbih</span>
+            <span class="more-tool-desc">Sunnah Azkar & Durood Sharif</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('ayat-day')">
+            <span class="more-tool-icon">✨</span>
+            <span class="more-tool-title">Ayat of the Day</span>
+            <span class="more-tool-desc">Daily Quranic reflection</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('hadith-day')">
+            <span class="more-tool-icon">📜</span>
+            <span class="more-tool-title">Hadith of the Day</span>
+            <span class="more-tool-desc">Authentic Sunnah teachings</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('mosques')">
+            <span class="more-tool-icon">📍</span>
+            <span class="more-tool-title">Nearby Mosques</span>
+            <span class="more-tool-desc">Find closest places of worship</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('madhab')">
+            <span class="more-tool-icon">🕌</span>
+            <span class="more-tool-title">Madhab Settings</span>
+            <span class="more-tool-desc">Hanafi / Shafi prayer calculation</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('settings')">
+            <span class="more-tool-icon">⚙️</span>
+            <span class="more-tool-title">Filters & Settings</span>
+            <span class="more-tool-desc">Quran reciters, themes, audio</span>
+          </div>
+
+          <div class="more-tool-card" onclick="openPinpointModal()">
+            <span class="more-tool-icon">🎯</span>
+            <span class="more-tool-title">Building Pinpoint</span>
+            <span class="more-tool-desc">100% exact address deduction</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 18: DIGITAL TASBIH (#view-tasbih)
+         ========================================================================== -->
+    <section id="view-tasbih" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Digital Tasbih</div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="openTasbihPickerModal()">📿</button>
+        </div>
+      </header>
+
+      <div class="tasbih-content">
+        <div class="tasbih-active-name" id="tasbih-title-display">سَيِّدُ الِاسْتِغْفَارِ (Sayyidul Istighfar)</div>
+        <div class="tasbih-active-arabic" id="tasbih-arabic-display">اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ خَلَقْتَنِي وَأَنَا عَبْدُكَ...</div>
+        <div class="tasbih-active-meaning" id="tasbih-meaning-display">اے اللہ! تو ہی میرا رب ہے، تیرے سوا کوئی معبود نہیں، تو نے مجھے پیدا کیا اور میں تیرا بندہ ہوں۔</div>
+        <div class="tasbih-active-ref" id="tasbih-reference-display">صحیح البخاری: 6306 • افضل ترین استغفار</div>
+
+        <div class="tasbih-counter-circle" onclick="incrementTasbihCounter()">
+          <div class="tasbih-count-digit" id="tasbih-counter-val">0</div>
+          <div class="tasbih-target-pill" id="tasbih-target-val">Target: 33</div>
+        </div>
+
+        <!-- Target Selector Chips -->
+        <div class="tasbih-target-selector">
+          <span style="font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-right:4px;">ہدف (Target):</span>
+          <button class="target-chip active" id="chip-target-33" onclick="setTasbihTarget(33)">33</button>
+          <button class="target-chip" id="chip-target-70" onclick="setTasbihTarget(70)">70</button>
+          <button class="target-chip" id="chip-target-100" onclick="setTasbihTarget(100)">100</button>
+          <button class="target-chip" id="chip-target-500" onclick="setTasbihTarget(500)">500</button>
+          <button class="target-chip" id="chip-target-1000" onclick="setTasbihTarget(1000)">1000</button>
+          <button class="target-chip" id="chip-target-0" onclick="setTasbihTarget(0)">∞</button>
+        </div>
+
+        <div class="tasbih-controls-row">
+          <button class="btn-arch-outline" style="flex:1;" onclick="resetTasbihCounter()">
+            <span>🔄</span> <span>Reset</span>
+          </button>
+          <button class="btn-arch-solid" style="flex:1.4;" onclick="openTasbihPickerModal()">
+            <span>📿</span> <span>Select Zikr / استغفار</span>
+          </button>
+        </div>
+
+        <div style="margin-top:0.75rem; display:flex; flex-direction:column; gap:0.45rem;">
+          <button class="btn-arch-outline" onclick="triggerTasbihReminderNow()" style="width:100%; justify-content:center; border-radius:12px; font-weight:700; padding:0.55rem; font-size:0.8rem; background:rgba(16,185,129,0.06); border-color:var(--emerald-primary); color:var(--emerald-primary);">
+            <span>🔔</span> <span>Play Notification Sound & Alert (تسبیح چائم آواز)</span>
+          </button>
+          <div onclick="openVerifiedSourcesModal()" style="text-align:center; font-size:0.75rem; color:var(--emerald-primary); cursor:pointer; font-weight:600; padding:0.25rem;">
+            ✓ 100% Masnoon & Verified Duas from Sahih Bukhari & Muslim (ثبوت دیکھیں) ➔
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 19: RAMADAN CALENDAR (#view-ramadan-calendar)
+         ========================================================================== -->
+    <section id="view-ramadan-calendar" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Ramadan Calendar 1446</div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="openFastingDuasModal()" title="Fasting Duas">🤲</button>
+        </div>
+      </header>
+
+      <div class="ramadan-calendar-wrapper">
+        <div class="ramadan-hero-banner">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-family: var(--font-arabic); font-size: 1.8rem; color: #fef08a;">رَمَضَانُ الْمُبَارَك</div>
+              <div style="font-size: 0.82rem; opacity: 0.85;">1446 Hijri • Full 30-Day Timetable</div>
+            </div>
+            <div style="text-align:right;">
+              <span style="background:rgba(255,255,255,0.15); padding:0.25rem 0.65rem; border-radius:999px; font-size:0.75rem; font-weight:800; border:1px solid rgba(212,175,55,0.4);" id="ramadan-location-pill">Pakistan Standard</span>
+            </div>
+          </div>
+
+          <!-- Sehri & Iftar Duas -->
+          <div class="ramadan-dua-card">
+            <div class="ramadan-dua-title">🌅 دعائے نیتِ روزہ (سحری کی دعا)</div>
+            <div class="ramadan-dua-ar">وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ</div>
+            <div class="ramadan-dua-ur">اور میں نے ماہِ رمضان کے کل کے روزے کی نیت کی۔</div>
+          </div>
+
+          <div class="ramadan-dua-card">
+            <div class="ramadan-dua-title">🌇 دعائے افطار (افطاری کی دعا)</div>
+            <div class="ramadan-dua-ar">اللَّهُمَّ إِنِّي لَكَ صُمْتُ وَبِكَ آمَنْتُ وَعَلَيْكَ تَوَكَّلْتُ وَعَلَىٰ رِزْقِكَ أَفْطَرْتُ</div>
+            <div class="ramadan-dua-ur">اے اللہ! میں نے تیرے ہی لیے روزہ رکھا، تجھ پر ایمان لایا، تجھ پر بھروسہ کیا اور تیرے ہی دیے ہوئے رزق سے افطار کیا۔</div>
+          </div>
+        </div>
+
+        <!-- 3 Ashra Duas Tabs -->
+        <div class="ramadan-ashra-tabs">
+          <button class="ramadan-ashra-btn active" id="btn-ashra-1" onclick="switchAshraTab(1)">پہلا عشرہ (رحمت)</button>
+          <button class="ramadan-ashra-btn" id="btn-ashra-2" onclick="switchAshraTab(2)">دوسرا عشرہ (مغفرت)</button>
+          <button class="ramadan-ashra-btn" id="btn-ashra-3" onclick="switchAshraTab(3)">تیسرا عشرہ (نجات)</button>
+        </div>
+
+        <div id="ramadan-ashra-dua-box" style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:0.85rem; margin-bottom:1rem; box-shadow:var(--card-shadow);">
+          <div style="font-size:0.75rem; font-weight:800; color:var(--emerald-primary); margin-bottom:0.3rem;" id="ashra-dua-title">پہلے عشرے کی دعا (1 تا 10 رمضان - ایامِ رحمت)</div>
+          <div class="dua-arabic" id="ashra-dua-ar" dir="rtl">رَبِّ اغْفِرْ وَارْحَمْ وَأَنْتَ خَيْرُ الرَّاحِمِينَ</div>
+          <div style="font-family:var(--font-urdu); font-size:0.92rem; direction:rtl; text-align:right; color:var(--text-secondary);" id="ashra-dua-ur">اے میرے رب! مجھے بخش دے، مجھ پر رحم فرما اور تو سب سے بہترین رحم فرمانے والا ہے۔</div>
+        </div>
+
+        <!-- 30-Day Table -->
+        <div style="margin-bottom:0.5rem; display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.85rem; font-weight:800; color:var(--emerald-primary);">📅 مکمل ۳۰ روزہ شیڈول (Sehri & Iftar Times)</span>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Fiqh Hanafi (Karachi Standard)</span>
+        </div>
+
+        <table class="ramadan-table" id="ramadan-timetable">
+          <thead>
+            <tr>
+              <th>روزہ #</th>
+              <th>تاریخ</th>
+              <th>سحری ختم</th>
+              <th>افطار وقت</th>
+            </tr>
+          </thead>
+          <tbody id="ramadan-table-body">
+            <!-- Populated dynamically by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 20: UMRAH GUIDE (HANAFI / SUNNI) (#view-umrah-guide)
+         ========================================================================== -->
+    <section id="view-umrah-guide" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Umrah Guide <span class="urdu-title-badge" dir="rtl">(عمرہ کا طریقہ)</span></div>
+        <div class="header-right">
+          <span style="font-size:0.75rem; font-weight:800; background:var(--emerald-subtle); color:var(--emerald-primary); padding:3px 8px; border-radius:999px;">حنفی / اہلسنت</span>
+        </div>
+      </header>
+
+      <div class="guide-content-wrapper">
+        <div class="ramadan-hero-banner" style="margin-bottom:0;">
+          <div style="font-family: var(--font-arabic); font-size: 1.65rem; color: #fef08a; direction:rtl; text-align:right;">عُمْرَةٌ مَبْرُورَةٌ</div>
+          <div style="font-size:0.88rem; line-height:1.6; margin-top:0.35rem;">
+            عمرہ سنتِ مؤکدہ ہے۔ فقہ حنفی کے مطابق عمرہ کے <strong>۲ فرض</strong> (احرام اور طواف) اور <strong>۲ واجب</strong> (سعی اور حلق/قصر) ہیں۔
+          </div>
+        </div>
+
+        <!-- Step 1 -->
+        <div class="guide-step-card">
+          <div class="guide-step-header">
+            <span class="guide-step-num">۱</span>
+            <span class="guide-step-title">احرام اور نیت (ميقات سے پہلے)</span>
+          </div>
+          <div class="guide-step-desc">
+            ۱. ناخن تراشیں، زائد بال دور کریں اور غسل (یا وضو) کریں۔<br>
+            ۲. مرد دو سفید ان سلی چادریں اوڑھیں۔ عورتیں معمول کے باحجاب کپڑے پہنیں (چہرے پر کپڑا نہ لگے)۔<br>
+            ۳. دو رکعت نفل نمازِ احرام پڑھیں (پہلی رکعت میں سورۃ الکافرون اور دوسری میں سورۃ الاخلاص پڑھنا مستحب ہے)۔<br>
+            ۴. نماز کے بعد نیت کریں اور تین بار بلند آواز سے تلبیہ کہیں۔
+          </div>
+          <div style="font-size:0.75rem; font-weight:800; color:var(--emerald-primary);">عمرہ کی نیت کے الفاظ:</div>
+          <div class="guide-arabic-dua">اللَّهُمَّ إِنِّي أُرِيدُ الْعُمْرَةَ فَيَسِّرْهَا لِي وَتَقَبَّلْهَا مِنِّي</div>
+          <div class="guide-urdu-dua">اے اللہ! میں عمرہ کا ارادہ کرتا ہوں، پس تو اس کو میرے لیے آسان فرما اور میری طرف سے قبول فرما۔</div>
+
+          <div style="font-size:0.75rem; font-weight:800; color:var(--emerald-primary); margin-top:0.5rem;">تلبیہ (لبیک اللھم لبیک):</div>
+          <div class="guide-arabic-dua">لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ، إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ، لَا شَرِيكَ لَكَ</div>
+          <div class="guide-urdu-dua">حاضر ہوں اے اللہ میں حاضر ہوں! حاضر ہوں، تیرا کوئی شریک نہیں، میں حاضر ہوں! بے شک تمام تعریفیں اور نعمتیں تیری ہی ہیں اور بادشاہی بھی تیری ہے، تیرا کوئی شریک نہیں۔</div>
+          <div style="font-size:0.78rem; background:rgba(239,68,68,0.1); border-left:3px solid #ef4444; padding:0.5rem; border-radius:6px; color:#991b1b; margin-top:0.5rem;">
+            ⚠️ <strong>احرام کی پابندیاں:</strong> خوشبو لگانا، سر ڈھانپنا (مردوں کے لیے)، سلا ہوا کپڑا پہننا، ناخن یا بال کاٹنا، جھگڑا کرنا سب حرام ہو جاتے ہیں۔
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="guide-step-card">
+          <div class="guide-step-header">
+            <span class="guide-step-num">۲</span>
+            <span class="guide-step-title">مسجدِ حرام میں داخلہ اور طوافِ کعبہ</span>
+          </div>
+          <div class="guide-step-desc">
+            ۱. مسجدِ حرام میں دایاں پاؤں رکھ کر داخل ہوں اور دعائے دخول پڑھیں۔ جب پہلی بار کعبہ شریف پر نظر پڑے تو تین بار تکبیر و تہلیل کہیں اور دل کھول کر دعائیں مانگیں (پہلی نظر کی دعا قبول ہوتی ہے)۔<br>
+            ۲. <strong>اضطباع:</strong> مرد احرام کی چادر دائیں بغل کے نیچے سے نکال کر بائیں کندھے پر ڈال لیں (دایاں کندھا کھلا رہے)۔<br>
+            ۳. طواف حجرِ اسود سے شروع کریں۔ حجرِ اسود کے سامنے دونوں ہاتھ کانوں تک اٹھا کر کہیں: <em>بِسْمِ اللَّهِ اللَّهُ أَكْبَرُ وَلِلَّهِ الْحَمْدُ</em> اور استلام کریں۔ طواف شروع کرتے ہی تلبیہ بند کر دیں۔<br>
+            ۴. <strong>رمل:</strong> پہلے ۳ چکروں میں مرد بہادری کے ساتھ چھوٹے چھوٹے قدموں سے جھوم کر چلیں، باقی ۴ چکر معمول کے مطابق چلیں۔<br>
+            ۵. کعبہ شریف کے گرد ۷ چکر لگائیں (الٹی سمت میں)۔ ہر چکر پر حجرِ اسود کا استلام کریں۔ رکنِ یمانی اور حجرِ اسود کے درمیان یہ دعا پڑھیں:
+          </div>
+          <div class="guide-arabic-dua">رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ</div>
+          <div class="guide-step-desc">
+            ۶. ۷ چکر پورے ہونے پر دایاں کندھا ڈھانپ لیں اور مقامِ ابراہیم کے پیچھے (یا حرم میں جہاں جگہ ملے) <strong>دو رکعت واجب الطواف</strong> ادا کریں۔<br>
+            ۷. ملتزم پر لپٹ کر دعا مانگیں اور پیٹ بھر کر آبِ زمزم کھڑے ہو کر قبلہ رخ پئیں۔
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="guide-step-card">
+          <div class="guide-step-header">
+            <span class="guide-step-num">۳</span>
+            <span class="guide-step-title">سعی بین الصفا والمروہ</span>
+          </div>
+          <div class="guide-step-desc">
+            ۱. صفا پہاڑی پر چڑھیں، قبلہ رخ کھڑے ہو کر دونوں ہاتھ اٹھائیں، تکبیر و تہلیل کہیں اور آیت پڑھیں:
+          </div>
+          <div class="guide-arabic-dua">إِنَّ الصَّفَا وَالْمَرْوَةَ مِن شَعَائِرِ اللَّهِ ۖ أَبْدَأُ بِمَا بَدَأَ اللَّهُ بِهِ</div>
+          <div class="guide-step-desc">
+            ۲. صفا سے مروہ کی طرف چلیں۔ جب سبز لائٹوں والے حصے میں پہنچیں تو مرد درمیانی رفتار سے دوڑیں (میلین اخضرین)۔<br>
+            ۳. مروہ پر پہنچنے سے ۱ چکر مکمل ہوا۔ مروہ پر بھی قبلہ رخ ہو کر دعائیں مانگیں۔<br>
+            ۴. مروہ سے صفا واپسی پر ۲ چکر مکمل۔ اسی طرح ۷ واں چکر مروہ پہاڑی پر ختم ہوگا۔<br>
+            ۵. سعی کے بعد دو رکعت نفل پڑھنا مستحب ہے۔
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="guide-step-card">
+          <div class="guide-step-header">
+            <span class="guide-step-num">۴</span>
+            <span class="guide-step-title">حلق یا قصر (احرام کھولنا)</span>
+          </div>
+          <div class="guide-step-desc">
+            ۱. <strong>حلق (سر منڈوانا):</strong> مردوں کے لیے افضل یہ ہے کہ پورے سر پر استرا پھروا کر بال منڈوائیں۔ نبی کریم ﷺ نے حلق کروانے والوں کے لیے تین بار مغفرت کی دعا فرمائی ہے۔<br>
+            ۲. <strong>قصر (بال کٹوانا):</strong> یا پورے سر سے کم از کم انگلی کے ایک پورے (۱ انچ) کے برابر بال چاروں طرف سے کٹوائیں۔<br>
+            ۳. <strong>خواتین کے لیے:</strong> خواتین اپنی چٹیا کے نچلے سرے سے انگلی کے ایک پورے کے برابر بال خود کاٹ لیں یا محرم سے کٹوائیں۔ خواتین کے لیے سر منڈوانا حرام ہے۔<br>
+            ۴. بال کٹواتے ہی عمرہ مکمل ہو گیا اور احرام کی تمام پابندیاں ختم ہو گئیں۔ <strong>عمرہ مبارک!</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 21: HAJJ GUIDE (HANAFI / SUNNI) (#view-hajj-guide)
+         ========================================================================== -->
+    <section id="view-hajj-guide" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Hajj Guide <span class="urdu-title-badge" dir="rtl">(حج کا مکمل طریقہ)</span></div>
+        <div class="header-right">
+          <span style="font-size:0.75rem; font-weight:800; background:var(--emerald-subtle); color:var(--emerald-primary); padding:3px 8px; border-radius:999px;">حنفی / اہلسنت</span>
+        </div>
+      </header>
+
+      <div class="guide-content-wrapper">
+        <div class="ramadan-hero-banner" style="margin-bottom:0;">
+          <div style="font-family: var(--font-arabic); font-size: 1.65rem; color: #fef08a; direction:rtl; text-align:right;">حَجٌّ مَّبْرُورٌ</div>
+          <div style="font-size:0.88rem; line-height:1.6; margin-top:0.35rem;">
+            حج اسلام کا پانچواں بنیادی رکن ہے۔ فقہ حنفی میں حج کے <strong>۳ فرائض</strong> (احرام، وقوفِ عرفات، طوافِ زیارت) اور <strong>۶ واجبات</strong> ہیں۔ ذیل میں ۸ تا ۱۲ ذوالحجہ کا مکمل شیڈول و احکام ہیں۔
+          </div>
+        </div>
+
+        <!-- 8th Dhul Hijjah -->
+        <div class="guide-step-card">
+          <div class="guide-step-header">
+            <span class="guide-step-num">۸</span>
+            <span class="guide-step-title">۸ ذوالحجہ (یوم الترویہ - منیٰ کی روانگی)</span>
+          </div>
+          <div class="guide-step-desc">
+            • مکہ مکرمہ کی رہائش گاہ سے غسل کر کے حج کا احرام باندھیں اور نیت کریں:
+          </div>
+          <div class="guide-arabic-dua">اللَّهُمَّ إِنِّي أُرِيدُ الْحَجَّ فَيَسِّرْهُ لِي وَتَقَبَّلْهُ مِنِّي</div>
+          <div class="guide-step-desc">
+            • تین بار بلند آواز سے تلبیہ کہیں۔<br>
+            • زوال سے پہلے منیٰ کی خیمہ بستی روانہ ہو جائیں۔<br>
+            • منیٰ میں ظہر، عصر، مغرب، عشاء اور ۹ ذوالحجہ کی فجر کی نمازیں اپنے اپنے وقت پر قصر کے ساتھ ادا کریں اور رات منیٰ میں گزاریں (سنتِ مؤکدہ)۔
+          </div>
+        </div>
+
+        <!-- 9th Dhul Hijjah -->
+        <div class="guide-step-card">
+          <div class="guide-step-header">
+            <span class="guide-step-num">۹</span>
+            <span class="guide-step-title">۹ ذوالحجہ (یومِ عرفہ اور مزدلفہ کی رات)</span>
+          </div>
+          <div class="guide-step-desc">
+            • ۹ ذوالحجہ کو سورج نکلنے کے بعد منیٰ سے میدانِ عرفات روانہ ہوں۔<br>
+            • <strong>وقوفِ عرفات (حج کا سب سے بڑا فرض):</strong> زوالِ آفتاب کے بعد سے غروبِ آفتاب تک میدانِ عرفات میں وقوف کریں۔ مسجد نمرہ میں یا اپنے خیمے میں ظہر اور عصر باجماعت قصر و جمع کے ساتھ ادا کریں۔<br>
+            • ہاتھ اٹھا کر گریہ و زاری کے ساتھ توبہ، دعائیں، درود شریف اور تلبیہ پڑھیں۔ رسول اللہ ﷺ نے فرمایا: <em>«الْحَجُّ عَرَفَةُ»</em> (حج تو عرفات ہی ہے)۔<br>
+            • <strong>مزدلفہ روانگی:</strong> غروبِ آفتاب ہوتے ہی مغرب پڑھے بغیر پرسکون طریقے سے مزدلفہ روانہ ہو جائیں۔<br>
+            • مزدلفہ پہنچ کر عشاء کے وقت مغرب (۳ رکعت) اور عشاء (۲ رکعت) ایک اذان اور ایک اقامت سے اکٹھی پڑھیں۔<br>
+            • رات کھلے آسمان تلے ذکر و عبادت اور آرام میں گزاریں۔ رمی کے لیے چنے کے برابر ۷۰ کنکریاں چن لیں۔
+          </div>
+        </div>
+
+        <!-- 10th Dhul Hijjah -->
+        <div class="guide-step-card">
+          <div class="guide-step-header">
+            <span class="guide-step-num">۱۰</span>
+            <span class="guide-step-title">۱۰ ذوالحجہ (یوم النحر - عید کا دن - ۴ ارکان)</span>
+          </div>
+          <div class="guide-step-desc">
+            فقہ حنفی میں ترتیب کا خیال رکھنا ضروری ہے:<br><br>
+            <strong>۱. جمرۂ عقبہ کی رمی:</strong> صبح صادق کے بعد مزدلفہ میں وقوف کریں، پھر منیٰ پہنچیں۔ بڑے شیطان کو ۷ کنکریاں ماریں۔ ہر کنکری پر کہیں: <em>بِسْمِ اللَّهِ اللَّهُ أَكْبَرُ رَغْمًا لِلشَّيْطَانِ وَرِضًا لِلرَّحْمٰنِ</em>۔ پہلی کنکری پر تلبیہ کہنا بند کر دیں۔<br><br>
+            <strong>۲. شکرانے کی قربانی:</strong> متمتع اور قارن پر دَم شکر (قربانی) واجب ہے۔<br><br>
+            <strong>۳. حلق یا قصر (سر منڈوانا):</strong> قربانی کے بعد مرد سر منڈوائیں یا بال کٹوائیں۔ خواتین انگلی کے ایک پورے برابر بال کاٹیں۔ اب پہلا تحلل ہو گیا (احرام کی پابندیاں ختم، سوائے ازدواجی تعلق کے)۔<br><br>
+            <strong>۴. طوافِ زیارت (فرض):</strong> مکہ مکرمہ جا کر کعبہ کا طوافِ زیارت اور صفا مروہ کی سعی کریں۔ اس کے بعد دوسرا تحلل ہو گیا اور ہر چیز حلال ہو گئی۔ پھر رات گزارنے منیٰ واپس آ جائیں۔
+          </div>
+        </div>
+
+        <!-- 11th & 12th Dhul Hijjah -->
+        <div class="guide-step-card">
+          <div class="guide-step-header">
+            <span class="guide-step-num">۱۱</span>
+            <span class="guide-step-title">۱۱ اور ۱۲ ذوالحجہ (ایامِ تشریق و طوافِ وداع)</span>
+          </div>
+          <div class="guide-step-desc">
+            • دونوں دن منیٰ میں قیام واجب ہے۔<br>
+            • زوال کے بعد تینوں جمرات کو بالترتیب کنکریاں ماریں: پہلے چھوٹے شیطان کو (۷)، پھر درمیانے شیطان کو (۷)، پھر بڑے شیطان کو (۷)۔ چھوٹے اور درمیانے کے بعد قبلہ رخ ہو کر دعائیں مانگیں۔<br>
+            • ۱۲ ذوالحجہ کو رمی کے بعد اگر چاہیں تو غروبِ آفتاب سے پہلے منیٰ سے مکہ مکرمہ کے لیے رخصت ہو سکتے ہیں۔<br>
+            • <strong>طوافِ وداع:</strong> مکہ مکرمہ سے اپنے وطن روانگی سے قبل آخری طواف (طوافِ وداع) تمام آفاقی حاجیوں پر واجب ہے۔<br>
+            • <strong>زیارتِ مدینہ منورہ:</strong> حج کے بعد (یا پہلے) مدینۃ المنورہ کی باادب حاضری اور روضۂ اقدس ﷺ پر صلاۃ و سلام کا نذرانہ پیش کرنا عظیم سعادت ہے۔
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 22: VERIFIED CONTENT & SOURCES (#view-verified-sources)
+         ========================================================================== -->
+    <section id="view-verified-sources" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">100% Verified Content & Sources</div>
+        <div class="header-right">
+          <span style="font-size:0.75rem; font-weight:800; background:rgba(16,185,129,0.15); color:#059669; padding:3px 8px; border-radius:999px;">✓ مصدقہ</span>
+        </div>
+      </header>
+
+      <div class="sources-content-wrapper">
+        <div class="ramadan-hero-banner" style="margin-bottom:0;">
+          <div style="font-family: var(--font-arabic); font-size: 1.5rem; color: #fef08a; direction:rtl; text-align:right;">بِسْمِ اللَّهِ الرَّحْمٰنِ الرَّحِيمِ</div>
+          <div style="font-size:0.86rem; line-height:1.6; margin-top:0.4rem;">
+            نور الاسلام ایپ کا تمام تر قرآنی، احادیث اور دعاؤں کا مواد <strong>۱۰۰٪ مستند اور مصدقہ عالمی مآخذ</strong> سے لیا گیا ہے۔ ذیل میں تمام مکمل اسناد و تفاصیل شفافیت کے ساتھ پیش ہیں:
+          </div>
+        </div>
+
+        <!-- 1. Quran Source Card -->
+        <div class="sources-card">
+          <div class="sources-card-header">
+            <span class="sources-card-title">📖 ۱. القرآن الکریم (عربی متن، رسم الخط و اعراب)</span>
+            <span class="sources-badge-verified">100% Certified</span>
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>مستند عالمی ماخذ:</strong> Tanzil Quran Project (<a href="https://tanzil.net" target="_blank" style="color:var(--emerald-primary); font-weight:700;">tanzil.net</a>) مع <strong>مجمع الملك فهد لطباعة المصحف الشريف (شاہ فہد قرآن پرنٹنگ کمپلیکس، مدینہ منورہ)</strong>۔ تمام ۱۱۴ سورتیں اور ۶،۲۳۶ آیاتِ مبارکہ، ۳۰ پارے اور ۵۴۰ رکوعات۔
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>رسم الخط و فونٹس:</strong> برصغیر پاک و ہند کا مستند <strong>Indo-Pak Nastaliq / Naskh رسم الخط</strong> (PDMS Saleem Quran Font از ادارہ پی ڈی ایم ایس پاکستان اور Noor-e-Huda فونٹ)۔
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>تصدیق و صحت:</strong> تمام اعراب، حرکات، تجوید کے رموز، علاماتِ وقف (ط، ج، ز، ص، قف، صلے، قلے، لا، معانقہ ∴ اور وقفِ لازم مـ) مصحفِ پاکستان اور سرکاری منظور شدہ نسخوں سے ۱۰۰٪ مطابقت رکھتے ہیں۔ کوئی بھی ڈبہ (□ Tofu) یا مسنگ کوڈ موجود نہیں۔
+          </div>
+        </div>
+
+        <!-- 2. Urdu & English Translation -->
+        <div class="sources-card">
+          <div class="sources-card-header">
+            <span class="sources-card-title">📜 ۲. اردو و انگریزی تراجم اور تفاسیر</span>
+            <span class="sources-badge-verified">Authentic</span>
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>اردو ترجمہ:</strong> <strong>حضرت مولانا فتح محمد جالندھریؒ</strong> (Maulana Fateh Muhammad Jalandhry) — پاکستان اور دنیا بھر میں تمام مکاتبِ فکر، وفاق المدارس اور قرآن بورڈز کی طرف سے تصدیق شدہ فصیح اور سب سے زیادہ متفق علیہ ترجمہ۔
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>انگریزی ترجمہ:</strong> <strong>Saheeh International</strong> — عالمی سطح پر مستند اور منظور شدہ بین الاقوامی ترجمہ۔
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>معتبر تفاسیر:</strong> خلاصۂ تفسیر ابن کثیرؒ (عماد الدین ابن کثیرؒ) اور معارف القرآن (مفتی اعظم پاکستان مفتی محمد شفیعؒ)۔
+          </div>
+        </div>
+
+        <!-- 3. Hadith Source -->
+        <div class="sources-card">
+          <div class="sources-card-header">
+            <span class="sources-card-title">📚 ۳. ذخیرۂ احادیثِ نبویہ ﷺ (صحاح ستہ)</span>
+            <span class="sources-badge-verified">Kutub al-Sittah Sahih</span>
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>اصولِ صحاح ستہ:</strong> صحیح البخاری (امام محمد بن اسماعیل بخاریؒ)، صحیح مسلم (امام مسلم بن الحجاج النیسابوریؒ)، جامع الترمذی، سنن ابی داؤد، سنن النسائی، سنن ابن ماجہ۔
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>ترقیم و حوالہ جات:</strong> عالمی ترقیم (Standard International Hadith Numbering - المکتبۃ الشاملۃ و دارالسلام) کے مطابق ہر حدیث کی کتاب، باب اور حدیث نمبر باقاعدہ واضح طور پر درج ہے۔ کسی بھی غیر مستند یا ضعیف روایت سے مکمل احتراز کیا گیا ہے۔
+          </div>
+        </div>
+
+        <!-- 4. Hanafi Fiqh Hajj & Umrah -->
+        <div class="sources-card">
+          <div class="sources-card-header">
+            <span class="sources-card-title">🕋 ۴. فقہ حنفی کے مطابق احکامِ حج و عمرہ</span>
+            <span class="sources-badge-verified">Hanafi Sunni Fiqh</span>
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>معتبر فقہی مراجع:</strong> بہارِ شریعت حصہ ششم (صدر الشریعہ مفتی محمد امجد علی اعظمیؒ)، رد المحتار علی الدر المختار / فتاویٰ شامی (علامہ ابن عابدین شامیؒ)، الہدایہ فی شرح بدایۃ المبتدی (امام مرغینانیؒ)، اور الفتاویٰ الہندیہ (فتاویٰ عالمگیری)۔
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>ارکان و مسائل:</strong> احرام، میقات، طواف کے اضطباع و رمل، مقامِ ابراہیم پر ۲ رکعت واجب الطواف، صفا و مروہ کی سعی، اور حلق و قصر کے مسائل فقہ حنفی کی اصل کتب کی روشنی میں ۱۰۰٪ تصدیق شدہ ہیں۔
+          </div>
+        </div>
+
+        <!-- 5. Masnoon Duas & Tasbih -->
+        <div class="sources-card">
+          <div class="sources-card-header">
+            <span class="sources-card-title">📿 ۵. مسنون ادعیہ، تسبیحات و استغفار</span>
+            <span class="sources-badge-verified">Masnoon &amp; Sahih</span>
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>مستند اسناد:</strong> سید الاستغفار (صحیح البخاری: 6306)، تسبیحِ فاطمہؓ (صحیح البخاری: 3705 / صحیح مسلم: 2727)، سبحان اللہ وبحمدہ (صحیح البخاری: 6405)، درودِ ابراہیمی (صحیح البخاری: 3370 / صحیح مسلم: 405)۔
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>قرآنی و نبوی دعائیں:</strong> چالیس قرآنی دعائیں (40 Rabbana)، انبیاء کرامؑ کی دعائیں، چھ کلمات، اور حصن المسلم (شیخ سعید بن علی بن وہف القحطانیؒ) کے تمام مصدقہ کلمات۔
+          </div>
+        </div>
+
+        <!-- 6. Audio Source -->
+        <div class="sources-card">
+          <div class="sources-card-header">
+            <span class="sources-card-title">🎙️ ۶. صوتی تلاوتِ قرآن (Audio Stream)</span>
+            <span class="sources-badge-verified">High Definition</span>
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>قاری:</strong> فضیلۃ الشیخ <strong>مشاری بن راشد العفاسی</strong> (Sheikh Mishary Rashid Alafasy) کی متصل و مصدقہ تلاوت۔
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>سرورز و نیٹ ورک:</strong> EveryAyah.com اور Mp3Quran.net نیٹ ورک — جامعہ الازہر اور عالمی مجالسِ تلاوت سے تصدیق شدہ ہائی کوالٹی ۱۲۸ کلو بٹ آڈیو فائلیں۔
+          </div>
+        </div>
+
+        <!-- 7. Prayer Times Calculation -->
+        <div class="sources-card">
+          <div class="sources-card-header">
+            <span class="sources-card-title">⏰ ۷. اوقاتِ نماز کا شرعی و فلکیاتی طریقہ کار</span>
+            <span class="sources-badge-verified">Karachi Banuri Town</span>
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>شرعی معیار:</strong> جامعہ علومِ اسلامیہ علامہ بنوری ٹاؤن کراچی (University of Islamic Sciences, Karachi) — فجر ۱۸ درجے، عشاء ۱۸ درجے، اور عصر حنفی مثلین پر۔
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>فلکیاتی حساب:</strong> سورج کا میل (Solar Declination)، تعدیلِ ایام (Equation of Time)، اور بلدی نقاط پر مبنی انتہائی درست جیوڈٹک الگورتھم۔
+          </div>
+        </div>
+
+        <!-- 8. Qibla Direction -->
+        <div class="sources-card">
+          <div class="sources-card-header">
+            <span class="sources-card-title">🧭 ۸. قبلہ سمت اور جیوڈٹک بیرنگ</span>
+            <span class="sources-badge-verified">Geodetic Accurate</span>
+          </div>
+          <div class="sources-card-item" dir="rtl">
+            <strong>قبلہ کا حساب:</strong> خانہ کعبہ کے حقیقی عالمی نقاط (21.422487° N, 39.826206° E) پر گریٹ سرکل بیرنگ فارمولا اور NOAA کے جیو میگنیٹک ڈیکلینیشن سے تصدیق شدہ ٹرو بیرنگ۔
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div> <!-- End .app-container -->
+
+  <!-- ==========================================================================
+       BOTTOM 5-TAB DOCKED NAVIGATION BAR (MATCHING REFERENCE SCREENS)
+       ========================================================================== -->
+  <nav class="bottom-nav-bar">
+    <button class="nav-item-btn active" id="nav-btn-home" onclick="navigateTo('home')">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="nav-item-btn" id="nav-btn-quran" onclick="navigateTo('quran-main')">
+      <svg viewBox="0 0 24 24"><path d="M19 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 16H6V4h12v14z"/></svg>
+      <span>Quran</span>
+    </button>
+    <button class="nav-item-btn" id="nav-btn-qibla" onclick="navigateTo('qibla')">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+      <span>Qibla</span>
+    </button>
+    <button class="nav-item-btn" id="nav-btn-azan" onclick="navigateTo('azan-alarm')">
+      <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
+      <span>Azan</span>
+    </button>
+    <button class="nav-item-btn" id="nav-btn-more" onclick="navigateTo('more')">
+      <svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+      <span>More</span>
+    </button>
+  </nav>
+
+  <!-- ==========================================================================
+       MODAL 1: RAMADAN & DAILY FASTING DUAS (#modal-fasting-duas)
+       ========================================================================== -->
+  <div class="modal-overlay" id="modal-fasting-duas" onclick="closeFastingDuasModal()">
+    <div class="modal-sheet-card" onclick="event.stopPropagation()">
+      <div class="modal-header-row">
+        <div class="modal-title-text">🌙 Masnoon Fasting Duas</div>
+        <button class="btn-modal-close" onclick="closeFastingDuasModal()">✕</button>
+      </div>
+
+      <!-- Sehri Dua -->
+      <div class="dua-box-card">
+        <div class="dua-box-title">Dua for Sehri / Niyyah for Fasting (سحری کی دعا)</div>
+        <div class="dua-arabic">وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ</div>
+        <div class="dua-urdu">اور میں نے کل کے رمضان کے روزے کی نیت کی</div>
+        <div class="dua-english">"I intend to keep the fast for tomorrow in the month of Ramadan."</div>
+      </div>
+
+      <!-- Iftar Dua -->
+      <div class="dua-box-card">
+        <div class="dua-box-title">Dua for Iftar / Breaking Fast (افطاری کی دعا)</div>
+        <div class="dua-arabic">اللَّهُمَّ إِنِّي لَكَ صُمْتُ وَعَلَىٰ رِزْقِكَ أَفْطَرْتُ</div>
+        <div class="dua-urdu">اے اللہ! میں نے تیرے ہی لیے روزہ رکھا اور تیرے ہی رزق سے افطار کیا</div>
+        <div class="dua-english">"O Allah, I fasted for You and I break my fast with Your sustenance."</div>
+      </div>
+
+      <!-- Sunnah Iftar Dua -->
+      <div class="dua-box-card">
+        <div class="dua-box-title">Sunnah Dua After Iftar (افطاری کے بعد کی دعا)</div>
+        <div class="dua-arabic">ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ</div>
+        <div class="dua-urdu">پیاس چلی گئی، رگیں تر ہو گئیں اور ان شاء اللہ اجر ثابت ہو گیا</div>
+        <div class="dua-english">"The thirst has gone, the veins are moistened, and the reward is confirmed, if Allah wills."</div>
+      </div>
+
+      <button class="btn-arch-solid" style="width:100%; border-radius:12px;" onclick="closeFastingDuasModal()">
+        Close (بند کریں)
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 2: QURAN OPTIONS (#modal-quran-options)
+       ========================================================================== -->
+  <div class="modal-overlay" id="modal-quran-options" onclick="closeQuranOptionsModal()">
+    <div class="modal-sheet-card" onclick="event.stopPropagation()">
+      <div class="modal-header-row">
+        <div class="modal-title-text">Quran Options</div>
+        <button class="btn-modal-close" onclick="closeQuranOptionsModal()">✕</button>
+      </div>
+
+      <div class="quran-tabs-row" style="margin-bottom:1rem;">
+        <button class="quran-tab-btn active" id="opt-tab-trans" onclick="switchOptionsTab('trans')">Translation</button>
+        <button class="quran-tab-btn" id="opt-tab-tafsir" onclick="switchOptionsTab('tafsir')">Tafsir</button>
+      </div>
+
+      <div id="options-body-trans">
+        <div style="font-size:0.85rem; font-weight:700; color:var(--text-secondary); margin-bottom:0.5rem;">Select Translation:</div>
+        <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.9rem;">
+            <input type="radio" name="opt_translation" value="none" onchange="setQuranTranslation('none')"> No Translation
+          </label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.9rem;">
+            <input type="radio" name="opt_translation" value="urdu" checked onchange="setQuranTranslation('urdu')"> Urdu Translation (جالندھری)
+          </label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.9rem;">
+            <input type="radio" name="opt_translation" value="english" onchange="setQuranTranslation('english')"> English Translation (Sahih Int.)
+          </label>
+        </div>
+
+        <div style="font-size:0.85rem; font-weight:700; color:var(--text-secondary); margin-bottom:0.5rem;">Select Reciter:</div>
+        <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.9rem;">
+            <input type="radio" name="opt_reciter" value="alafasy" checked onchange="setQuranReciter('alafasy')"> Mishary Rashid Alafasy
+          </label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.9rem;">
+            <input type="radio" name="opt_reciter" value="basit" onchange="setQuranReciter('basit')"> Abdul Basit
+          </label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.9rem;">
+            <input type="radio" name="opt_reciter" value="shuraim" onchange="setQuranReciter('shuraim')"> Saud Al-Shuraim
+          </label>
+        </div>
+
+        <div style="font-size:0.85rem; font-weight:700; color:var(--text-secondary); margin-bottom:0.5rem;">Quran Display Script:</div>
+        <div style="display:flex; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+          <button class="sound-pill active" id="btn-script-indopak" onclick="setQuranScript('indopak')">Indo-Pak Naskh (Clear & Bold)</button>
+          <button class="sound-pill" id="btn-script-madani" onclick="setQuranScript('madani')">Madani Naskh</button>
+          <button class="sound-pill" id="btn-script-uthmani" onclick="setQuranScript('uthmani')">Uthmani Classical</button>
+        </div>
+      </div>
+
+      <div id="options-body-tafsir" style="display:none; font-size:0.9rem; color:var(--text-secondary); margin-bottom:1.5rem;">
+        Authentic Ibn Kathir & Tafheem-ul-Quran notes are automatically paired with verses.
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+        <button class="btn-arch-outline" onclick="closeQuranOptionsModal()">Cancel</button>
+        <button class="btn-arch-solid" onclick="applyQuranOptions()">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 3: EXACT LOCATION PINPOINT (#location-pinpoint-modal)
+       ========================================================================== -->
+  <div class="modal-overlay" id="location-pinpoint-modal" onclick="closePinpointModal()">
+    <div class="modal-sheet-card" onclick="event.stopPropagation()">
+      <div class="modal-header-row">
+        <div class="modal-title-text">🎯 100% Exact Building Pinpoint</div>
+        <button class="btn-modal-close" onclick="closePinpointModal()">✕</button>
+      </div>
+      <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.85rem;">
+        Deduct or search your exact building, pharmacy, shop, plaza, or sector with pinpoint precision:
+      </p>
+
+      <div style="position:relative; width:100%; margin-bottom:0.85rem;">
+        <input type="text" id="pinpoint-search-input" placeholder="e.g. D-Watson Pharmacy Main PWD Road Islamabad" style="width:100%; padding:0.85rem 1rem; border:1px solid var(--card-border); border-radius:12px; font-size:0.9rem; outline:none; background:var(--bg-page); color:var(--text-primary);">
+        <span id="pinpoint-search-spinner" style="display:none; position:absolute; right:14px; top:12px;">⏳</span>
+      </div>
+
+      <div id="pinpoint-search-results" style="max-height:160px; overflow-y:auto; margin-bottom:1rem; display:flex; flex-direction:column; gap:0.5rem;"></div>
+
+      <div style="display:flex; flex-direction:column; gap:0.6rem;">
+        <button class="btn-arch-solid" style="border-radius:12px;" onclick="lockHardwareGpsSatellite()">
+          <span>🛰️</span> <span>Re-Lock Hardware Satellite GPS (&lt;10m)</span>
+        </button>
+        <button class="btn-arch-outline" style="border-radius:12px; font-size:0.82rem;" onclick="selectPresetLocation('D-Watson Pharmacy, 35-C Block D, Main PWD Road Islamabad', 33.57142, 73.14546)">
+          <span>📍</span> <span>Quick Set: D-Watson Pharmacy, Main PWD Road Islamabad</span>
+        </button>
+        <button class="btn-arch-outline" style="border-radius:12px; font-size:0.82rem;" onclick="selectPresetLocation('Karachi, Pakistan', 24.8607, 67.0011)">
+          <span>📍</span> <span>Quick Set: Karachi, Pakistan</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASBIH PICKER MODAL SHEET -->
+  <div class="modal-overlay" id="tasbih-picker-modal" onclick="closeTasbihPickerModal()">
+    <div class="modal-sheet-card" onclick="event.stopPropagation()" style="max-height:85vh; display:flex; flex-direction:column;">
+      <div class="modal-header-row">
+        <div class="modal-title-text">📿 ذکر و استغفار منتخب کریں (Select Zikr)</div>
+        <button class="btn-modal-close" onclick="closeTasbihPickerModal()">✕</button>
+      </div>
+
+      <!-- Search in modal -->
+      <div style="padding: 0 1rem 0.5rem 1rem;">
+        <input type="text" id="tasbih-modal-search" placeholder="تلاش کریں (استغفار، درود، کلمہ، تسبیح، dua)..." oninput="filterTasbihModal(this.value)" style="width:100%; padding:0.55rem 0.85rem; border-radius:10px; border:1px solid var(--card-border); background:var(--bg-page); color:var(--text-primary); font-size:0.85rem; outline:none;">
+      </div>
+
+      <!-- Categories tabs in modal -->
+      <div class="tasbih-modal-category-tabs" style="display:flex; gap:0.35rem; overflow-x:auto; padding:0 1rem 0.6rem 1rem;">
+        <button class="sound-pill active" id="tasbih-tab-all" onclick="filterTasbihTab('all')">سب (All)</button>
+        <button class="sound-pill" id="tasbih-tab-astaghfar" onclick="filterTasbihTab('astaghfar')">🤲 استغفار (Astaghfar)</button>
+        <button class="sound-pill" id="tasbih-tab-tasbih" onclick="filterTasbihTab('tasbih')">✨ تسبیح و تحمید</button>
+        <button class="sound-pill" id="tasbih-tab-durood" onclick="filterTasbihTab('durood')">💚 درود شریف</button>
+        <button class="sound-pill" id="tasbih-tab-kalima" onclick="filterTasbihTab('kalima')">📜 ۶ کلمات</button>
+        <button class="sound-pill" id="tasbih-tab-dua" onclick="filterTasbihTab('dua')">🤲 مسنون دعائیں</button>
+      </div>
+
+      <div id="tasbih-modal-presets-list" style="display:flex; flex-direction:column; gap:0.6rem; padding:0 1rem 1rem 1rem; overflow-y:auto; flex:1;"></div>
+    </div>
+  </div>
+
+  <!-- 100% VERIFIED AUTHENTIC SOURCES & PROOF MODAL -->
+  <div class="modal-overlay" id="modal-verified-sources" onclick="closeVerifiedSourcesModal()">
+    <div class="modal-sheet-card" onclick="event.stopPropagation()">
+      <div class="modal-header-row">
+        <div class="modal-title-text" style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.25rem;">📜</span>
+          <span>100% مستند مراجع و ثبوت (Verified Sources)</span>
+        </div>
+        <button class="btn-modal-close" onclick="closeVerifiedSourcesModal()" title="Close">✕</button>
+      </div>
+
+      <div class="verified-modal-scroll">
+        <!-- Authenticity Guarantee Banner -->
+        <div style="background:rgba(16,185,129,0.1); border:1.5px solid var(--emerald-primary); border-radius:14px; padding:1rem 1.15rem;">
+          <div style="display:flex; align-items:center; gap:0.55rem; margin-bottom:0.45rem;">
+            <span style="font-size:1.35rem;">🛡️</span>
+            <div style="font-weight:800; font-size:1rem; color:var(--emerald-primary);">100% شرعی و علمی تصدیق (100% Authenticity Guarantee)</div>
+          </div>
+          <p style="font-size:0.86rem; line-height:1.8; color:var(--text-secondary); margin:0;" dir="rtl">
+            نور الاسلام ایپ کا تمام قرآنی متن، تراجم، تفاسیر، ذخیرۂ احادیثِ نبویہ ﷺ (صحاح ستہ)، فقہی احکام (حج و عمرہ حنفی)، مسنون اذکار و ادعیہ، اور اوقاتِ نماز و قبلہ کمپاس کا فلکیاتی حساب ۱۰۰٪ مستند اور متفقہ معتبر ترین ماخذ سے مرتب کیا گیا ہے۔ کسی بھی غیر مستند یا ضعیف روایت سے مکمل احتراز کیا گیا ہے۔
+          </p>
+        </div>
+
+        <!-- 1. Quran Source Card -->
+        <div class="verified-detail-box">
+          <div class="verified-detail-box-header">
+            <div class="verified-detail-box-title">
+              <span>📖</span> <span>۱. القرآن الکریم (عربی متن، رسم الخط و اعراب)</span>
+            </div>
+            <span class="verified-detail-badge">100% Tanzil &amp; Madinah Certified</span>
+          </div>
+          <div class="verified-detail-content" dir="rtl">
+            <div class="verified-detail-item">
+              <strong>• قرآنی متن (Arabic Corpus):</strong> عالمی شہرت یافتہ <em>Tanzil.net Quran Project (v1.0.2)</em>، جو کہ <strong>مجمع الملك فهد لطباعة المصحف الشريف (شاہ فہد قرآن پرنٹنگ کمپلیکس، مدینہ منورہ)</strong> کے مطبوعہ و مصدقہ مصحفِ مدینہ کے عین مطابق اور ۱۰۰٪ حرف بہ حرف من و عن محفوظ ہے۔ تمام ۱۱۴ سورتیں، ۶،۲۳۶ آیاتِ مبارکہ، ۳۰ پارے/اجزاء اور ۵۴۰ رکوعات۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• برصغیر پاک و ہند رسم الخط (Indo-Pak Script):</strong> پاکستانی اور ہند و پاک قرآنی معیاری فونٹس (PDMS Saleem Quranic Font اور Noorehuda Font) کا استعمال، جس میں تمام اعراب، چھوٹی الف، مدات، اور رموزِ اوقاف و علاماتِ وقف (ط، ج، ز، ص، قف، صلے، قلے، لا، معانقہ ∴، اور وقفِ لازم مـ) بغیر کسی مسنگ کوڈ یا ڈبے (□ Tofu) کے درست ترین ظاہر ہوتے ہیں۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• عثمانی رسم الخط (Uthmani Script):</strong> مصحفِ مدینہ منورہ کا اصل عثمانی متن جو عالمی قراءت کے قواعد و معیارات کے عین مطابق ہے۔
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Translations & Tafsir Card -->
+        <div class="verified-detail-box">
+          <div class="verified-detail-box-header">
+            <div class="verified-detail-box-title">
+              <span>📜</span> <span>۲. مستند اردو و انگریزی تراجم و تفاسیر</span>
+            </div>
+            <span class="verified-detail-badge">Consensus Approved</span>
+          </div>
+          <div class="verified-detail-content" dir="rtl">
+            <div class="verified-detail-item">
+              <strong>• مستند اردو ترجمہ:</strong> <strong>حضرت مولانا فتح محمد جالندھریؒ</strong> (Maulana Fateh Muhammad Jalandhry) کا ترجمہ — پاکستان، برصغیر اور دنیا بھر میں تمام مکاتبِ فکر، وفاق المدارس، اور قرآن بورڈز کی جانب سے سب سے زیادہ متفق علیہ، فصیح اور مستند مصدقہ اردو ترجمہ۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• مستند انگریزی ترجمہ:</strong> <strong>Saheeh International</strong> — عالمی سطح پر معتبر جید علماء کا مصدقہ اور قبولِ عام حاصل شدہ ترجمہ۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• معتبر تفاسیر (Exegesis):</strong> خلاصۂ تفسیر ابن کثیرؒ (امام عماد الدین ابن کثیرؒ) اور معارف القرآن (مفتی اعظم پاکستان مفتی محمد شفیع عثمانیؒ)۔
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Hadith Source Card -->
+        <div class="verified-detail-box">
+          <div class="verified-detail-box-header">
+            <div class="verified-detail-box-title">
+              <span>📚</span> <span>۳. ذخیرۂ احادیثِ نبویہ ﷺ (صحاح ستہ)</span>
+            </div>
+            <span class="verified-detail-badge">Kutub al-Sittah Sahih</span>
+          </div>
+          <div class="verified-detail-content" dir="rtl">
+            <p style="margin:0 0 0.25rem 0;">ایپ میں موجود تمام احادیث مبارکہ اہل سنت والجماعت کی چھ بنیادی کتبِ حدیث (صحاح ستہ / الکتب الستہ) سے براہ راست لی گئی ہیں اور ہر حدیث کے ساتھ کتاب، باب اور ترقیم کا مکمل حوالہ درج ہے:</p>
+            <div class="verified-detail-item">
+              <strong>۱. صحیح البخاری (Sahih al-Bukhari):</strong> امیر المؤمنین فی الحدیث امام ابوعبداللہ محمد بن اسماعیل بخاریؒ (عالمی ترقیم: علامہ محمد فؤاد عبدالباقی)۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>۲. صحیح مسلم (Sahih Muslim):</strong> امام مسلم بن الحجاج القشیری النیسابوریؒ۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>۳. جامع الترمذی (Jami` at-Tirmidhi):</strong> امام ابو عیسیٰ محمد بن عیسیٰ ترمذیؒ۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>۴. سنن ابی داؤد (Sunan Abi Dawud):</strong> امام ابوداؤد سلیمان بن اشعث سجستانیؒ۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>۵. سنن النسائی (Sunan an-Nasa'i):</strong> امام احمد بن شعیب نسائیؒ۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>۶. سنن ابن ماجہ (Sunan Ibn Majah):</strong> امام محمد بن یزید ابن ماجہؒ۔
+            </div>
+            <div style="background:var(--bg-page); padding:0.65rem 0.85rem; border-radius:10px; border:1px solid var(--card-border); font-size:0.82rem; line-height:1.7;">
+              🔍 ہر حدیث کے عربی متن، اردو ترجمہ اور انگریزی ترجمہ کے ساتھ حوالہ جات دارالسلام اور المکتبۃ الشاملۃ کے تصدیق شدہ بین الاقوامی ایڈیشن کے مطابق ہیں۔
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Hanafi Fiqh Hajj & Umrah Card -->
+        <div class="verified-detail-box">
+          <div class="verified-detail-box-header">
+            <div class="verified-detail-box-title">
+              <span>🕋</span> <span>۴. فقہ حنفی کے مطابق احکامِ حج و عمرہ</span>
+            </div>
+            <span class="verified-detail-badge">Hanafi Sunni Fiqh</span>
+          </div>
+          <div class="verified-detail-content" dir="rtl">
+            <p style="margin:0 0 0.25rem 0;">حج اور عمرہ کے تمام تفصیلی احکام، مناسک و ارکان فقہ حنفی (اہل سنت والجماعت) کے معتبر ترین متون و فتاویٰ سے مرتب کیے گئے ہیں:</p>
+            <div class="verified-detail-item">
+              <strong>• بہارِ شریعت (Bahar-e-Shari'at):</strong> صدر الشریعہ مفتی محمد امجد علی اعظمیؒ (حصہ ششم: حج و عمرہ کے شرعی مسائل)۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• رد المحتار علی الدر المختار (فتاویٰ شامی):</strong> خاتمۃ المحققین علامہ سید محمد امین ابن عابدین شامیؒ۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• الہدایہ فی شرح بدایۃ المبتدی (Al-Hidayah):</strong> شیخ الاسلام امام برہان الدین علی بن ابی بکر مرغینانیؒ۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• الفتاویٰ الہندیہ (فتاویٰ عالمگیری):</strong> علمائے ہند کا عظیم معتبر فقہی انسائیکلوپیڈیا۔
+            </div>
+            <div style="font-size:0.82rem; color:var(--text-muted); line-height:1.7;">
+              احرام کے واجبات و ممنوعات، میقات، طواف کے اضطباع و رمل، مقامِ ابراہیم پر ۲ رکعت واجب الطواف، صفا و مروہ کی سعی و دعائیں، وقوفِ عرفات و مزدلفہ، اور حلق و قصر کے مسائل فقہ حنفی کی اصل کتب کی روشنی میں ۱۰۰٪ تصدیق شدہ ہیں۔
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Tasbih, Astaghfar & Duas Card -->
+        <div class="verified-detail-box">
+          <div class="verified-detail-box-header">
+            <div class="verified-detail-box-title">
+              <span>📿</span> <span>۵. مسنون ادعیہ، تسبیحات و استغفار</span>
+            </div>
+            <span class="verified-detail-badge">Masnoon &amp; Sahih</span>
+          </div>
+          <div class="verified-detail-content" dir="rtl">
+            <div class="verified-detail-item">
+              <strong>• سید الاستغفار:</strong> صحیح البخاری، حدیث نمبر 6306 (شداد بن اوسؓ سے مروی افضل ترین جامع استغفار)۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• تسبیح فاطمہؓ:</strong> صحیح البخاری، حدیث 3705 / صحیح مسلم، حدیث 2727 (۳۳ بار سبحان اللہ، ۳۳ بار الحمد للہ، ۳۴ بار اللہ اکبر)۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• کلمۂ تسبیح و تمجید:</strong> صحیح البخاری، حدیث 6405 (سبحان اللہ وبحمدہ سبحان اللہ العظیم — روزانہ ۱۰۰ بار پڑھنے پر گناہوں کی بخشش)۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• چالیس قرآنی دعائیں (40 Rabbana):</strong> قرآن کریم کی تمام چالیس "ربنا" دعائیں اپنی اصل سورتوں اور آیات کے حوالے کے ساتھ۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• انبیاء کرامؑ کی دعائیں:</strong> دعائے حضرت آدمؑ (الاعراف: 23)، آیتِ کریمہ / دعائے یونسؑ (الانبیاء: 87)، دعائے موسیٰؑ (القصص: 24)، دعائے ایوبؑ (الانبیاء: 83)۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• درودِ ابراہیمی:</strong> صحیح البخاری، حدیث 3370 / صحیح مسلم، حدیث 405۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• چھ کلمات (Six Kalimas):</strong> کتبِ احادیث و فقہ (کتاب الآثار، المعجم الکبیر) کے مصدقہ عربی کلمات۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• حصن المسلم (Hisnul Muslim):</strong> شیخ سعید بن علی بن وہف القحطانیؒ کی معتبر کتاب سے ماخوذ روزمرہ کی مسنون دعائیں۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• مسنون روزے کی دعائیں:</strong> سحری و افطاری کی مسنون دعائیں اور دعائے شبِ قدر (جامع الترمذی: 3513)۔
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Astronomical Prayer Engine Card -->
+        <div class="verified-detail-box">
+          <div class="verified-detail-box-header">
+            <div class="verified-detail-box-title">
+              <span>⏰</span> <span>۶. اوقاتِ نماز کا شرعی و فلکیاتی طریقہ کار</span>
+            </div>
+            <span class="verified-detail-badge">Karachi Banuri Town</span>
+          </div>
+          <div class="verified-detail-content" dir="rtl">
+            <div class="verified-detail-item">
+              <strong>• شرعی ضابطہ و ادارہ:</strong> جامعہ علومِ اسلامیہ علامہ بنوری ٹاؤن کراچی (University of Islamic Sciences, Banuri Town Karachi) کا متفقہ جدول و طریقہ کار۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• فجر و عشاء کے زاویے:</strong> فجر ۱۸.۰ درجے صبحِ صادق (Astronomical Twilight) اور عشاء ۱۸.۰ درجے شفقِ ابیض۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• عصر حنفی:</strong> فقہ حنفی کے مطابق مثلین (Asr Shadow Factor = 2 - زوال کے سایہ کے علاوہ ہر چیز کا سایہ دگنا ہونا)۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• فلکیاتی حساب:</strong> سورج کا میل (Solar Declination)، تعدیلِ ایام (Equation of Time)، اور بلدی نقاط پر مبنی انتہائی درست جیوڈٹک فلکیاتی الگورتھم۔
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. Qibla Direction & Geodetic Bearing Card -->
+        <div class="verified-detail-box">
+          <div class="verified-detail-box-header">
+            <div class="verified-detail-box-title">
+              <span>🧭</span> <span>۷. قبلہ سمت اور جیوڈٹک بیرنگ</span>
+            </div>
+            <span class="verified-detail-badge">NOAA Geodetic Accurate</span>
+          </div>
+          <div class="verified-detail-content" dir="rtl">
+            <div class="verified-detail-item">
+              <strong>• کعبہ شریف کے نقاط (Coordinates):</strong> مرکزِ کعبہ مشرفہ کے قطعی عالمی نقاط (عرض بلد 21.422487° N، طول بلد 39.826206° E)۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• عظیم دائرہ کا فارمولا (Great Circle Bearing):</strong> کروی مثلثیات (Spherical Trigonometry) کا فارورڈ ایزیموتھ فارمولا برائے درست ترین حقیقی سمتِ قبلہ۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• مقناطیسی انحراف کی درستگی (NOAA WMM):</strong> امریکی جیو میگنیٹک ڈیٹا (World Magnetic Model) کے ذریعے مقناطیسی شمال (Magnetic North) کو حقیقی شمال (True North) میں خودکار تبدیل کر کے زیرو ڈگری ایرر کی یقین دہانی۔
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. Audio Recitation Verification Card -->
+        <div class="verified-detail-box">
+          <div class="verified-detail-box-header">
+            <div class="verified-detail-box-title">
+              <span>🎙️</span> <span>۸. صوتی تلاوتِ قرآن مجید (Audio Stream)</span>
+            </div>
+            <span class="verified-detail-badge">High Definition 128kbps</span>
+          </div>
+          <div class="verified-detail-content" dir="rtl">
+            <div class="verified-detail-item">
+              <strong>• قاری:</strong> فضیلۃ الشیخ <strong>مشاری بن راشد العفاسی</strong> (Sheikh Mishary bin Rashid Alafasy) کی متصل، متواتر اور مصدقہ صوتی تلاوت۔
+            </div>
+            <div class="verified-detail-item">
+              <strong>• سرورز و نیٹ ورک:</strong> EveryAyah Project و Mp3Quran Networks — جامعہ الازہر اور عالمی مجالسِ تلاوت سے تصدیق شدہ ۱۲۸ کلو بٹ ہائی کوالٹی آڈیو فائلیں برائے ہموار تلاوت۔
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Action Button -->
+        <button class="btn-arch-solid" onclick="closeVerifiedSourcesModal()" style="width:100%; justify-content:center; padding:0.9rem; border-radius:14px; font-weight:800; font-size:1rem; margin-top:0.5rem; margin-bottom:1.5rem; cursor:pointer;">
+          <span>✓</span> <span>جزاک اللہ خیراً (بند کریں)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="js/quran-data.js"></script>
+  <script src="js/quran-indopak-data.js"></script>
+  <script src="js/quran-uthmani-data.js"></script>
+  <script src="js/prayer-engine.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    (function() {
+      const p = new URLSearchParams(window.location.search);
+      const scr = p.get('screen');
+      if (scr && typeof navigateTo === 'function') {
+        setTimeout(() => navigateTo(scr, false), 150);
+      }
+    })();
+  </script>
+
+</body>
+</html>
