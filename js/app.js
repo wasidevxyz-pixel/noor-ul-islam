@@ -11,7 +11,7 @@
 // Once loaded, data & audio are stored on disk and work completely offline
 // ==========================================================================
 const AdvanceCacheSystem = {
-  CACHE_NAME: 'noor_al_islam_audio_v3',
+  CACHE_NAME: 'noor_al_islam_audio_v4',
   STORAGE_PREFIX: 'noor_cache_',
 
   hasCacheApi() {
@@ -4774,9 +4774,6 @@ function renderHadithCollection(query = '', category = 'all') {
         <div class="hadith-card-urdu" dir="rtl">${h.urdu}</div>
         <div class="hadith-card-eng" dir="ltr">${h.english}</div>
         <div class="hadith-card-footer-btns">
-          <button class="hadith-action-btn hadith-audio-btn" id="btn-hadith-col-audio-${origIdx}" onclick="toggleHadithCollectionAudio(${origIdx}, this)" title="Listen / سنیں">
-            <span class="btn-icon">▶</span> <span class="btn-text">Listen</span>
-          </button>
           <button class="hadith-action-btn ${isBookmarked ? 'active' : ''}" onclick="toggleHadithBookmark(${origIdx}, this)">
             <span>🔖</span> <span>Bookmark</span>
           </button>
@@ -5857,10 +5854,7 @@ function renderSixKalimasUI() {
         ` : ''}
 
         <div class="kalima-actions-row">
-          <button class="kalima-audio-btn" id="btn-kalima-audio-${num}" onclick="toggleKalimaAudio(${num}, this)" title="Listen / سنیں">
-            <span class="btn-icon">▶</span> <span class="btn-text">Listen / سنیں</span>
-          </button>
-          <div class="kalima-right-actions">
+          <div class="kalima-right-actions" style="width:100%; justify-content:flex-end;">
             <button class="btn-kalima-action" onclick="copyKalimaText(${num})">📋 Copy</button>
             <button class="btn-kalima-action" onclick="shareKalimaText(${num})">📤 Share</button>
           </div>
@@ -6001,9 +5995,6 @@ function renderDailyDuasUI() {
       <div class="dua-card-footer">
         <div class="dua-card-ref">📖 ${d.ref || "مسنون دعا"}</div>
         <div class="dua-footer-btns">
-          <button class="dua-audio-btn" id="btn-dua-audio-${d.id}" onclick="toggleDuaAudio('${d.id}', this)" title="Listen / سنیں">
-            <span class="btn-icon">▶</span> <span class="btn-text">Listen / سنیں</span>
-          </button>
           <div class="dua-right-actions">
             <button class="btn-dua-action" onclick="copyDuaText('${d.id}')">📋 Copy</button>
             <button class="btn-dua-action" onclick="shareDuaText('${d.id}')">📤 Share</button>
@@ -6176,10 +6167,7 @@ function renderWuduContent() {
         </div>
 
         <div class="kalima-actions-row">
-          <button class="namaz-audio-btn" id="btn-wudu-dua-audio" onclick="toggleNamazStepAudio('wududua', this)" title="Listen / سنیں">
-            <span class="btn-icon">▶</span> <span class="btn-text">Listen / سنیں</span>
-          </button>
-          <div class="kalima-right-actions">
+          <div class="kalima-right-actions" style="width:100%; justify-content:flex-end;">
             <button class="btn-kalima-action" onclick="copyDuaText('wududua')">📋 Copy</button>
             <button class="btn-kalima-action" onclick="shareWuduGuide()">📤 Share</button>
           </div>
@@ -6325,10 +6313,7 @@ function renderNamazGuideUI(tab = 'steps') {
               ` : ''}
 
               <div class="kalima-actions-row" style="margin-top:0.85rem; padding-top:0.75rem; border-top:1px dashed var(--card-border);">
-                <button class="namaz-audio-btn" id="btn-namaz-audio-${s.id}" onclick="toggleNamazStepAudio('${s.id}', this)" title="Listen / سنیں">
-                  <span class="btn-icon">▶</span> <span class="btn-text">Listen / سنیں</span>
-                </button>
-                <div class="kalima-right-actions">
+                <div class="kalima-right-actions" style="width:100%; justify-content:flex-end;">
                   <button class="btn-kalima-action" onclick="copyNamazStepText('${s.id}')">📋 Copy</button>
                   <button class="btn-kalima-action" onclick="shareNamazStepText('${s.id}')">📤 Share</button>
                 </div>
@@ -6441,10 +6426,7 @@ function renderNamazGuideUI(tab = 'steps') {
             </div>
 
             <div class="kalima-actions-row" style="margin-top:0.85rem; padding-top:0.75rem; border-top:1px dashed var(--card-border);">
-              <button class="namaz-audio-btn" id="btn-namaz-audio-step_qunoot" onclick="toggleNamazStepAudio('step_qunoot', this)" title="Listen / سنیں">
-                <span class="btn-icon">▶</span> <span class="btn-text">Listen / سنیں</span>
-              </button>
-              <div class="kalima-right-actions">
+              <div class="kalima-right-actions" style="width:100%; justify-content:flex-end;">
                 <button class="btn-kalima-action" onclick="copyNamazStepText('step_qunoot')">📋 Copy</button>
                 <button class="btn-kalima-action" onclick="shareNamazStepText('step_qunoot')">📤 Share</button>
               </div>

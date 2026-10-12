@@ -13,6 +13,19 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="assets/icon.png">
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('noor_theme');
+        if (saved === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+          document.addEventListener('DOMContentLoaded', function() {
+            document.body && document.body.classList.add('dark-theme');
+          });
+        }
+      } catch(e) {}
+    })();
+  </script>
 </head>
 <body>
 
@@ -30,11 +43,32 @@
         <div class="drawer-nav-item" onclick="navigateTo('home'); closeSideDrawer();">
           <span>🏠</span> <span>Home / Dashboard</span>
         </div>
+        <div class="drawer-nav-item" onclick="navigateTo('islamic-calendar'); closeSideDrawer();">
+          <span>📅</span> <span>Islamic Calendar (تقویمِ ہجری)</span>
+        </div>
         <div class="drawer-nav-item" onclick="navigateTo('prayer-times'); closeSideDrawer();">
           <span>⏰</span> <span>Today's Prayer Times</span>
         </div>
+        <div class="drawer-nav-item" onclick="navigateTo('ramadan-calendar'); closeSideDrawer();">
+          <span>🌙</span> <span>Ramadan Timetable (رمضان شیڈول)</span>
+        </div>
         <div class="drawer-nav-item" onclick="openFastingDuasModal(); closeSideDrawer();">
-          <span>🌙</span> <span>Ramadan & Fasting Duas</span>
+          <span>🤲</span> <span>Ramadan & Fasting Duas</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('muslim-names'); closeSideDrawer();">
+          <span>👶</span> <span>Muslim Names & Meanings (اسلامی نام)</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('six-kalimas'); closeSideDrawer();">
+          <span>✨</span> <span>Six Kalimas (چھ کلمے مع آڈیو)</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('daily-duas'); closeSideDrawer();">
+          <span>🤲</span> <span>Daily Routine Duas (مسنون دعائیں)</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('wuzu-guide'); closeSideDrawer();">
+          <span>💧</span> <span>Wudu Complete Guide (طریقۂ وضو و فرائض)</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('namaz-guide'); closeSideDrawer();">
+          <span>🕌</span> <span>Namaz Step-by-Step (طریقۂ نماز مکمل مع قرآنی تلاوت)</span>
         </div>
         <div class="drawer-nav-item" onclick="navigateTo('quran-main'); closeSideDrawer();">
           <span>📖</span> <span>Holy Quran (Surahs & Paras)</span>
@@ -63,8 +97,17 @@
         <div class="drawer-nav-item" onclick="navigateTo('settings'); closeSideDrawer();">
           <span>⚙️</span> <span>Filters & Settings</span>
         </div>
+        <div class="drawer-nav-item" onclick="openCacheManagerModal(); closeSideDrawer();">
+          <span>⚡</span> <span>Advance Offline Cache (جدید کیشے سسٹم)</span>
+        </div>
+        <div class="drawer-nav-item" onclick="openThemePickerModal(); closeSideDrawer();">
+          <span>🎨</span> <span>Theme &amp; Colors (اسلامی رنگ و تھیمز)</span>
+        </div>
         <div class="drawer-nav-item" onclick="openPinpointModal(); closeSideDrawer();">
           <span>🎯</span> <span>100% Exact Building Pinpoint</span>
+        </div>
+        <div class="drawer-nav-item" onclick="openZakatModal(); closeSideDrawer();">
+          <span>💰</span> <span>Zakat Calculator (مستند زکوٰۃ کیلکولیٹر)</span>
         </div>
         <div class="drawer-nav-item" onclick="openVerifiedSourcesModal(); closeSideDrawer();">
           <span>📜</span> <span>100% Verified Sources (مستند مراجع)</span>
@@ -100,20 +143,47 @@
         <div class="home-greeting-title" id="home-greeting-title">Good Morning</div>
         <div class="home-greeting-sub">May Allah accept your good deeds.</div>
 
-        <div class="home-location-pill" onclick="openPinpointModal()" title="Tap to detect exact building">
-          <span>📍</span>
-          <span class="loc-name" id="home-location-name">Karachi, Pakistan</span>
-          <span style="font-size: 0.7rem; opacity: 0.8;">▾</span>
+        <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-top:0.4rem;">
+          <div class="home-location-pill" onclick="openPinpointModal()" title="Tap to view / adjust exact GPS building">
+            <span>📍</span>
+            <span class="loc-name" id="home-location-name">Auto-Detecting GPS...</span>
+            <span style="font-size: 0.7rem; opacity: 0.8;">▾</span>
+          </div>
+
+          <div class="home-weather-pill" id="home-weather-widget" onclick="openHourlyWeatherModal()" title="Tap to view 24-Hour Weather Forecast">
+            <span class="w-icon" id="weather-icon">☀️</span>
+            <span class="w-temp" id="weather-temp">28°C</span>
+            <span class="w-cond" id="weather-condition">Clear</span>
+            <span style="font-size: 0.65rem; opacity: 0.7;">📊</span>
+          </div>
         </div>
       </header>
 
-      <!-- Dual Cards (Current Time + Next Azan) -->
+      <!-- Severe Weather Alert Banner (Shown ONLY for Rain / Severe Heatwave) -->
+      <div class="weather-alert-banner alert-rain" id="home-weather-alert" style="display:none;" onclick="openHourlyWeatherModal()" title="Tap to view detailed forecast">
+        <div class="alert-icon-box" id="alert-icon-box">🌧️</div>
+        <div class="alert-content-box">
+          <div class="alert-title-row">
+            <span class="alert-title" id="alert-title">بارش و طوفان الرٹ (Rain Warning)</span>
+            <span class="alert-badge" id="alert-badge">Warning</span>
+          </div>
+          <div class="alert-desc" id="alert-desc">Bahar tez barish ka imkan hai. Ghair zaroori bahar jane se guraiz karein.</div>
+          <div class="alert-dua-pill" id="alert-dua-pill">
+            <span class="dua-arabic" id="alert-dua-arabic">«اللَّهُمَّ صَيِّبًا نَافِعًا»</span>
+            <span class="dua-meaning" id="alert-dua-meaning">اے اللہ! نفع بخش بارش بنا (بخاری)</span>
+          </div>
+        </div>
+        <button class="alert-dismiss-btn" onclick="dismissWeatherAlert(event)" title="Dismiss">✕</button>
+      </div>
+
+      <!-- Dual Cards (Current Time & Hijri Date + Next Azan) -->
       <section class="home-dual-cards-row">
-        <!-- Current Time Card -->
-        <div class="time-hero-card" onclick="navigateTo('clock-hero')">
-          <div class="time-hero-label">Current Time</div>
+        <!-- Current Time & Hijri Date Card -->
+        <div class="time-hero-card" onclick="navigateTo('islamic-calendar')" title="Tap to open Islamic Calendar (تقویمِ ہجری)">
+          <div class="time-hero-label">Current Time & Hijri Date</div>
           <div class="time-hero-val" id="home-current-time-val">10:24 AM</div>
-          <div class="time-hero-date" id="home-current-date-val">Fri, 25 Apr 2025</div>
+          <div class="time-hero-date" id="home-current-date-val">Thu, 8 Oct 2026</div>
+          <div class="time-hero-hijri" id="home-current-hijri-val">۲۷ ربیع الثانی ۱۴۴۸ھ • 27 Rabi' al-Thani 1448 AH</div>
         </div>
 
         <!-- Next Azan Card -->
@@ -146,17 +216,17 @@
           <div class="quick-action-icon">⏰</div>
           <div class="quick-action-title">Timings</div>
         </div>
-        <div class="quick-action-tile" onclick="openFastingDuasModal()">
-          <div class="quick-action-icon">🌙</div>
-          <div class="quick-action-title">Duas</div>
+        <div class="quick-action-tile" onclick="navigateTo('islamic-calendar')">
+          <div class="quick-action-icon">📅</div>
+          <div class="quick-action-title">Calendar</div>
+        </div>
+        <div class="quick-action-tile" onclick="navigateTo('muslim-names')">
+          <div class="quick-action-icon">👶</div>
+          <div class="quick-action-title">Names</div>
         </div>
         <div class="quick-action-tile" onclick="navigateTo('tasbih')">
           <div class="quick-action-icon">📿</div>
           <div class="quick-action-title">Tasbih</div>
-        </div>
-        <div class="quick-action-tile" onclick="navigateTo('mosques')">
-          <div class="quick-action-icon">📍</div>
-          <div class="quick-action-title">Mosques</div>
         </div>
         <div class="quick-action-tile" onclick="navigateTo('more')">
           <div class="quick-action-icon">✨</div>
@@ -203,6 +273,92 @@
         </div>
       </section>
 
+      <!-- ======================================================================
+           DAILY NAMAZ TRACKER & STREAK (روزانہ نماز لاگ و سٹریک)
+           ====================================================================== -->
+      <section class="namaz-tracker-card" id="home-namaz-tracker">
+        <div class="tracker-header-row">
+          <div class="tracker-title-box">
+            <span style="font-size:1.2rem;">🕌</span>
+            <span>Daily Prayer Tracker</span>
+            <span class="urdu-title-badge" dir="rtl">(نماز لاگ)</span>
+          </div>
+          <div class="tracker-streak-badge" id="tracker-streak-badge">
+            <span>🔥</span> <span id="tracker-streak-count">1-Day Streak</span>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:var(--text-muted); margin-bottom:0.35rem;">
+          <span id="tracker-status-label">0 of 5 Prayers Logged</span>
+          <span id="tracker-percent-label" style="font-weight:700; color:var(--emerald-accent);">0%</span>
+        </div>
+        <div class="tracker-progress-bar-bg">
+          <div class="tracker-progress-bar-fill" id="tracker-progress-fill" style="width: 0%;"></div>
+        </div>
+
+        <div class="tracker-pills-grid">
+          <div class="tracker-pill" id="track-fajr" onclick="togglePrayerLog('fajr')">
+            <span class="tracker-pill-name">Fajr</span>
+            <div class="tracker-pill-status">✓</div>
+          </div>
+          <div class="tracker-pill" id="track-dhuhr" onclick="togglePrayerLog('dhuhr')">
+            <span class="tracker-pill-name">Zuhr</span>
+            <div class="tracker-pill-status">✓</div>
+          </div>
+          <div class="tracker-pill" id="track-asr" onclick="togglePrayerLog('asr')">
+            <span class="tracker-pill-name">Asr</span>
+            <div class="tracker-pill-status">✓</div>
+          </div>
+          <div class="tracker-pill" id="track-maghrib" onclick="togglePrayerLog('maghrib')">
+            <span class="tracker-pill-name">Maghrib</span>
+            <div class="tracker-pill-status">✓</div>
+          </div>
+          <div class="tracker-pill" id="track-isha" onclick="togglePrayerLog('isha')">
+            <span class="tracker-pill-name">Isha</span>
+            <div class="tracker-pill-status">✓</div>
+          </div>
+        </div>
+
+        <div class="tracker-streak-dots-row">
+          <div class="streak-day-item"><span class="streak-day-label">M</span><div class="streak-day-circle" id="streak-dot-1">·</div></div>
+          <div class="streak-day-item"><span class="streak-day-label">T</span><div class="streak-day-circle" id="streak-dot-2">·</div></div>
+          <div class="streak-day-item"><span class="streak-day-label">W</span><div class="streak-day-circle" id="streak-dot-3">·</div></div>
+          <div class="streak-day-item"><span class="streak-day-label">T</span><div class="streak-day-circle" id="streak-dot-4">·</div></div>
+          <div class="streak-day-item"><span class="streak-day-label">F</span><div class="streak-day-circle" id="streak-dot-5">·</div></div>
+          <div class="streak-day-item"><span class="streak-day-label">S</span><div class="streak-day-circle" id="streak-dot-6">·</div></div>
+          <div class="streak-day-item"><span class="streak-day-label">S</span><div class="streak-day-circle" id="streak-dot-0">·</div></div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           MORNING & EVENING MASNOON AZKAR CARD (صبح و شام کے اذکار)
+           ====================================================================== -->
+      <section class="home-azkar-card" id="home-azkar-card">
+        <div class="azkar-card-top">
+          <div style="display:flex; align-items:center; gap:0.4rem; font-weight:800; font-size:0.92rem; color:var(--text-primary);">
+            <span id="azkar-hero-icon">🌅</span>
+            <span id="azkar-hero-title">Morning Azkar (صبح کے اذکار)</span>
+          </div>
+          <span class="azkar-time-badge" id="azkar-time-badge">Sunnah</span>
+        </div>
+
+        <div class="azkar-preview-arabic" id="azkar-hero-arabic" dir="rtl">
+          أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ
+        </div>
+        <div class="azkar-preview-urdu" id="azkar-hero-urdu" dir="rtl">
+          ہم نے صبح کی اور اللہ کے سارے ملک نے صبح کی، اور سب تعریفیں اللہ کے لیے ہیں۔
+        </div>
+
+        <div class="azkar-counter-chip">
+          <button class="btn-arch-outline" style="padding:0.35rem 0.65rem; font-size:0.75rem; border-radius:8px;" onclick="cycleHomeAzkar()">
+            <span>اگلی دعا ➔</span>
+          </button>
+          <button class="btn-arch-solid" style="padding:0.4rem 0.95rem; border-radius:10px; font-size:0.8rem;" onclick="tapHomeAzkarCount()">
+            <span id="azkar-tap-count-text">تسبیح کریں (1 / 3)</span>
+          </button>
+        </div>
+      </section>
+
       <!-- Daily Inspiration Section: Arabic -> Urdu -> English -->
       <section class="home-inspiration-container">
         <div class="home-section-header" style="padding: 0; margin-bottom: 0.6rem;">
@@ -232,10 +388,13 @@
           </div>
           <div class="insp-actions-row">
             <button class="insp-btn-subtle" onclick="navigateTo('ayat-day')">
-              <span>Read Full Card</span> <span>➔</span>
+              <span>Read Full / پورا پڑھیں</span> <span>➔</span>
+            </button>
+            <button class="insp-btn-subtle" style="color:var(--gold-accent); border-color:rgba(217,160,34,0.35); font-weight:700;" onclick="openCardGenerator('ayat')">
+              <span>📸</span> <span>Create Card / کارڈ بنائیں</span>
             </button>
             <button class="insp-btn-subtle" onclick="testInspirationNotification('ayat')">
-              <span>🔔 Send Notification</span>
+              <span>🔔 Send Alert / الرٹ</span>
             </button>
           </div>
         </div>
@@ -243,7 +402,7 @@
         <!-- Hadith Card -->
         <div class="home-insp-card" style="margin-top: 0.75rem;">
           <div class="insp-header-tag">
-            <span class="insp-title-badge">📜 Hadith of the Day</span>
+            <span class="insp-title-badge">📜 Hadith of the Day <span class="urdu-title-badge" dir="rtl">(حدیثِ نبوی ﷺ)</span></span>
             <span class="insp-ref-pill" id="home-hadith-ref">[Sahih Al-Bukhari]</span>
           </div>
           <div class="home-insp-arabic" id="home-hadith-arabic" dir="rtl">
@@ -257,10 +416,13 @@
           </div>
           <div class="insp-actions-row">
             <button class="insp-btn-subtle" onclick="navigateTo('hadith-day')">
-              <span>Read Full Card</span> <span>➔</span>
+              <span>Read Full / پورا پڑھیں</span> <span>➔</span>
+            </button>
+            <button class="insp-btn-subtle" style="color:var(--gold-accent); border-color:rgba(217,160,34,0.35); font-weight:700;" onclick="openCardGenerator('hadith')">
+              <span>📸</span> <span>Create Card / کارڈ بنائیں</span>
             </button>
             <button class="insp-btn-subtle" onclick="testInspirationNotification('hadith')">
-              <span>🔔 Send Notification</span>
+              <span>🔔 Send Alert / الرٹ</span>
             </button>
           </div>
         </div>
@@ -269,7 +431,7 @@
       <!-- ======================================================================
            RESUME QURAN READING QUICK CARD (DASHBOARD)
            ====================================================================== -->
-      <section class="bookmark-resume-card" id="home-resume-quran-card" style="margin-top: 1.25rem; cursor: pointer;" onclick="resumeLastReadQuran()">
+      <section class="bookmark-resume-card" id="home-resume-quran-card" style="margin-top: 1.25rem; cursor: pointer; display: none;" onclick="resumeLastReadQuran()">
         <div class="bookmark-resume-info">
           <span class="bookmark-resume-badge">📖 Resume Quran <span class="urdu-title-badge" dir="rtl">(آخری تلاوت)</span></span>
           <span class="bookmark-resume-title" id="home-resume-surah-title">Surah Al-Fatihah</span>
@@ -320,11 +482,12 @@
 
       <div class="pt-content">
         <!-- Location & Date Card -->
-        <div class="pt-meta-card">
+        <div class="pt-meta-card" onclick="navigateTo('islamic-calendar')" style="cursor:pointer;" title="Tap to open Islamic Calendar">
           <div class="pt-meta-loc">
-            <span>📍</span> <span id="pt-screen-loc">Karachi, Pakistan</span>
+            <span>📍</span> <span id="pt-screen-loc">Auto-Detecting GPS...</span>
           </div>
           <div class="pt-meta-date" id="pt-screen-date">Friday, 25 April 2025</div>
+          <div class="pt-meta-hijri" id="pt-screen-hijri">۲۷ ربیع الثانی ۱۴۴۸ھ • 27 Rabi' al-Thani 1448 AH</div>
         </div>
 
         <!-- Next Azan Highlight Card -->
@@ -512,9 +675,9 @@
         <div>
           <div class="settings-group-title">App Settings</div>
           <div class="settings-card">
-            <div class="settings-row" onclick="toggleAppTheme()">
-              <span class="settings-row-label">🎨 Theme</span>
-              <span class="settings-row-val" id="settings-current-theme">Light &gt;</span>
+            <div class="settings-row" onclick="openThemePickerModal()">
+              <span class="settings-row-label">🎨 Theme (خوبصورت تھیمز)</span>
+              <span class="settings-row-val" id="settings-current-theme">Emerald &amp; Gold &gt;</span>
             </div>
             <div class="settings-row" onclick="openPinpointModal()">
               <span class="settings-row-label">🎯 Building / GPS Pinpoint</span>
@@ -613,15 +776,15 @@
 
         <div class="arch-btn-group">
           <button class="btn-arch-outline" onclick="shareCurrentAyat()">
-            <span>🔗</span> <span>Share</span>
+            <span>🔗</span> <span>Share / شیئر</span>
           </button>
           <button class="btn-arch-solid" onclick="loadNextAyatOfDay()">
-            <span>Next Ayat</span> <span>➔</span>
+            <span>Next / اگلی آیت</span> <span>➔</span>
           </button>
         </div>
 
         <button class="btn-arch-outline" style="margin-top:0.75rem; width:100%; justify-content:center; border-radius:14px; font-weight:700;" onclick="testInspirationNotification('ayat')">
-          <span>🔔</span> <span>Send Ayat Notification to Phone</span>
+          <span>🔔</span> <span>Send Notification to Phone / فون پر الرٹ بھیجیں</span>
         </button>
       </div>
     </section>
@@ -665,12 +828,16 @@
 
           <div class="arch-btn-group" style="margin-top:1rem;">
             <button class="btn-arch-outline" onclick="shareCurrentHadith()">
-              <span>🔗</span> <span>Share</span>
+              <span>🔗</span> <span>Share / شیئر</span>
             </button>
             <button class="btn-arch-solid" onclick="loadNextHadithOfDay()">
-              <span>Next Hadith</span> <span>➔</span>
+              <span>Next / اگلی حدیث</span> <span>➔</span>
             </button>
           </div>
+
+          <button class="btn-arch-outline" style="margin-top:0.75rem; width:100%; justify-content:center; border-radius:14px; font-weight:700;" onclick="testInspirationNotification('hadith')">
+            <span>🔔</span> <span>Send Notification to Phone / فون پر الرٹ بھیجیں</span>
+          </button>
         </div>
 
         <!-- Hadith Search & Category Filters -->
@@ -804,45 +971,59 @@
         <div class="audio-controls-row">
           <button class="btn-autoscroll" id="btn-quran-autoscroll" onclick="toggleQuranAutoScroll()" title="Auto Scroll Quran">
             <span class="autoscroll-icon">︾</span>
-            <span class="autoscroll-text">Auto Scroll</span>
+            <span class="autoscroll-text">Scroll</span>
+          </button>
+
+          <button class="btn-audio-mini-nav" onclick="playPreviousAyah()" title="Previous Ayah (پچھلی آیت)">
+            <span>⏮</span>
           </button>
           
           <button class="player-center-play-circle" id="btn-toggle-quran-audio" onclick="toggleQuranPlayback()" title="Play / Pause Audio">
             <span id="quran-play-btn-icon">▶</span>
           </button>
 
-          <div class="audio-reciter-info">
-            <div class="reciter-title" id="reader-now-reciting">Mishary Rashid Alafasy</div>
-            <div class="audio-surah-indicator" id="reader-now-surah">Surah Al-Fatihah</div>
+          <button class="btn-audio-mini-nav" onclick="playNextAyah()" title="Next Ayah (اگلی آیت)">
+            <span>⏭</span>
+          </button>
+
+          <div class="audio-reciter-info" style="flex:1; min-width:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:0.3rem;">
+              <div class="reciter-title" id="reader-now-reciting" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Mishary Alafasy</div>
+              <button class="btn-auto-next-pill active" id="btn-toggle-auto-next" onclick="toggleAyahAutoNext()" title="Continuous Ayah Play">🔁 Auto Next</button>
+            </div>
+            <div class="audio-surah-indicator" id="reader-now-surah" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Tap any Ayah to recite</div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ==========================================================================
-         SCREEN 11: SEARCH IN QURAN (#view-quran-search)
+         SCREEN 11: UNIVERSAL ISLAMIC SEARCH (#view-quran-search)
          ========================================================================== -->
     <section id="view-quran-search" class="app-screen">
       <header class="screen-header">
         <div class="header-left">
           <button class="header-icon-btn" onclick="navigateBack()">←</button>
         </div>
-        <div class="header-title">Search</div>
+        <div class="header-title">Universal Islamic Search (تلاش)</div>
         <div class="header-right"></div>
       </header>
 
-      <div style="padding: 1rem;">
+      <div style="padding: 1rem; padding-bottom: calc(var(--nav-height) + 30px);">
         <div class="quran-search-bar" style="margin-bottom:0.75rem;">
           <span>🔍</span>
-          <input type="text" id="full-search-input" placeholder="Search surah, ayat, juz, para..." oninput="onFullSearchInput(this.value)">
+          <input type="text" id="full-search-input" placeholder="Search Surahs, Paras, Ayats, Hadiths, Duas, or Names..." oninput="onFullSearchInput(this.value)">
+          <button style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.1rem;" onclick="clearFullSearch()">✕</button>
         </div>
 
-        <div style="display:flex; gap:0.4rem; overflow-x:auto; margin-bottom:1rem;">
-          <button class="sound-pill active" onclick="setSearchFilter('all')">All</button>
-          <button class="sound-pill" onclick="setSearchFilter('surah')">Surah</button>
-          <button class="sound-pill" onclick="setSearchFilter('ayat')">Ayat</button>
-          <button class="sound-pill" onclick="setSearchFilter('juz')">Juz</button>
-          <button class="sound-pill" onclick="setSearchFilter('para')">Para</button>
+        <div style="display:flex; gap:0.4rem; overflow-x:auto; margin-bottom:1rem; padding-bottom:2px; scrollbar-width:none;">
+          <button class="sound-pill active" id="search-filter-all" onclick="setSearchFilter('all')">All (سب)</button>
+          <button class="sound-pill" id="search-filter-surah" onclick="setSearchFilter('surah')">📖 Surah</button>
+          <button class="sound-pill" id="search-filter-para" onclick="setSearchFilter('para')">📜 Para</button>
+          <button class="sound-pill" id="search-filter-ayat" onclick="setSearchFilter('ayat')">✨ Ayat</button>
+          <button class="sound-pill" id="search-filter-hadith" onclick="setSearchFilter('hadith')">📚 Hadith</button>
+          <button class="sound-pill" id="search-filter-dua" onclick="setSearchFilter('dua')">🤲 Duas</button>
+          <button class="sound-pill" id="search-filter-names" onclick="setSearchFilter('names')">👶 Names</button>
         </div>
 
         <div id="full-search-results-list" style="display:flex; flex-direction:column; gap:0.6rem;"></div>
@@ -1048,7 +1229,7 @@
           </div>
           <div class="qibla-info-row">
             <span style="color:var(--text-muted);">From your location:</span>
-            <span style="font-weight:700;" id="qibla-location-display">Islamabad, Pakistan</span>
+            <span style="font-weight:700;" id="qibla-location-display">Auto-Detecting GPS...</span>
           </div>
           <div class="qibla-info-row">
             <span style="color:var(--text-muted);">Sensor Accuracy:</span>
@@ -1183,6 +1364,16 @@
       </header>
 
       <div class="mosques-content">
+        <!-- Live Verified Mosques on Google Maps Launcher -->
+        <div class="open-google-maps-banner" onclick="openLiveGoogleMapsMosques()">
+          <div style="font-size:1.6rem;">🗺️</div>
+          <div style="flex:1;">
+            <div style="font-weight:800; font-size:0.95rem; color:#fff;">Open Verified Mosques in Google Maps</div>
+            <div style="font-size:0.75rem; color:rgba(255,255,255,0.9);">قریبی مساجد گوگل میپس پر لائیو دیکھیں مع پیدل راستہ</div>
+          </div>
+          <button class="btn-maps-launch">Open ➔</button>
+        </div>
+
         <!-- Interactive Radar Map -->
         <div class="radar-map-card">
           <div id="mosque-map-container"></div>
@@ -1215,6 +1406,42 @@
 
       <div class="more-content">
         <div class="more-grid-tools">
+          <div class="more-tool-card" onclick="navigateTo('islamic-calendar')" style="border-color: rgba(212, 175, 55, 0.4); background: linear-gradient(135deg, rgba(14,62,47,0.08) 0%, rgba(212,175,55,0.08) 100%);">
+            <span class="more-tool-icon">📅</span>
+            <span class="more-tool-title">Islamic Calendar (تقویمِ ہجری)</span>
+            <span class="more-tool-desc">Hijri dates, Holy events, sacred months & Ru'yat-e-Hilal</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('muslim-names')" style="border-color: rgba(16, 185, 129, 0.4); background: linear-gradient(135deg, rgba(16,185,129,0.06) 0%, rgba(37,99,235,0.06) 100%);">
+            <span class="more-tool-icon">👶</span>
+            <span class="more-tool-title">Muslim Baby Names (اسلامی نام)</span>
+            <span class="more-tool-desc">بچوں اور بچیوں کے مستند اسلامی نام مع اردو و انگریزی معانی</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('six-kalimas')" style="border-color: rgba(212, 175, 55, 0.4); background: linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(14,62,47,0.08) 100%);">
+            <span class="more-tool-icon">✨</span>
+            <span class="more-tool-title">Six Kalimas (چھ کلمے)</span>
+            <span class="more-tool-desc">عربی متن، اردو و انگریزی ترجمہ، رومن تلفظ اور آڈیو</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('daily-duas')" style="border-color: rgba(16, 185, 129, 0.4); background: linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(5,150,105,0.08) 100%);">
+            <span class="more-tool-icon">🤲</span>
+            <span class="more-tool-title">Daily Routine Duas (مسنون دعائیں)</span>
+            <span class="more-tool-desc">کھانے پینے، گھر، مسجد، سفر اور سونے جاگنے کی دعائیں</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('wuzu-guide')" style="border-color: rgba(37, 99, 235, 0.4); background: linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(14,62,47,0.08) 100%);">
+            <span class="more-tool-icon">💧</span>
+            <span class="more-tool-title">Wudu Complete Guide (طریقۂ وضو)</span>
+            <span class="more-tool-desc">وضو کے ۴ لازمی فرائض، سنتیں، مرحلہ وار طریقہ و نواقض</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('namaz-guide')" style="border-color: rgba(16, 185, 129, 0.4); background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(14,62,47,0.1) 100%);">
+            <span class="more-tool-icon">🕌</span>
+            <span class="more-tool-title">Namaz Guide (طریقۂ نماز مع قرآنی تلاوت)</span>
+            <span class="more-tool-desc">تکبیر سے سلام تک مرحلہ وار طریقہ، سورتوں کی مثالیں اور آڈیو</span>
+          </div>
+
           <div class="more-tool-card" onclick="navigateTo('ramadan-calendar')" style="border-color: rgba(212, 175, 55, 0.4); background: linear-gradient(135deg, rgba(14,62,47,0.06) 0%, rgba(212,175,55,0.06) 100%);">
             <span class="more-tool-icon">🌙</span>
             <span class="more-tool-title">Ramadan Calendar</span>
@@ -1231,6 +1458,12 @@
             <span class="more-tool-icon">🕋</span>
             <span class="more-tool-title">حج کا طریقہ (Hajj Guide)</span>
             <span class="more-tool-desc">۸ تا ۱۲ ذوالحجہ کا مکمل شیڈول و احکام</span>
+          </div>
+
+          <div class="more-tool-card" onclick="openZakatModal()" style="border-color: rgba(212, 175, 55, 0.4); background: linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(14,62,47,0.08) 100%);">
+            <span class="more-tool-icon">💰</span>
+            <span class="more-tool-title">Zakat Calculator (زکوٰۃ کیلکولیٹر)</span>
+            <span class="more-tool-desc">سونے، چاندی، نقدی اور مالِ تجارت پر ۲.۵ فیصد زکوٰۃ کا مکمل مستند حساب مع نصاب</span>
           </div>
 
           <div class="more-tool-card" onclick="navigateTo('verified-sources')" style="border-color: rgba(16, 185, 129, 0.4);">
@@ -1348,22 +1581,35 @@
         <div class="header-left">
           <button class="header-icon-btn" onclick="navigateBack()">←</button>
         </div>
-        <div class="header-title">Ramadan Calendar 1446</div>
+        <div class="header-title">Ramadan Calendar (رمضان المبارک)</div>
         <div class="header-right">
           <button class="header-icon-btn" onclick="openFastingDuasModal()" title="Fasting Duas">🤲</button>
         </div>
       </header>
 
       <div class="ramadan-calendar-wrapper">
+        <!-- Year Switcher Tabs -->
+        <div class="cal-tabs-switch-row" style="margin-bottom: 0.75rem;">
+          <button class="cal-tab-btn active" id="btn-ramadan-1448" onclick="switchRamadanYear(1448)">
+            🌟 Ramadan 1448 (Feb 2027) • Upcoming
+          </button>
+          <button class="cal-tab-btn" id="btn-ramadan-1447" onclick="switchRamadanYear(1447)">
+            🌙 Ramadan 1447 (Feb 2026) • Past
+          </button>
+        </div>
+
         <div class="ramadan-hero-banner">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <div style="font-family: var(--font-arabic); font-size: 1.8rem; color: #fef08a;">رَمَضَانُ الْمُبَارَك</div>
-              <div style="font-size: 0.82rem; opacity: 0.85;">1446 Hijri • Full 30-Day Timetable</div>
+              <div style="font-family: var(--font-arabic); font-size: 1.8rem; color: #fef08a;" id="ramadan-hero-title">رَمَضَانُ الْمُبَارَك ١٤٤٨ هـ</div>
+              <div style="font-size: 0.82rem; opacity: 0.85;" id="ramadan-hero-subtitle">1448 Hijri • Full 30-Day Timetable • Sehri & Iftar</div>
             </div>
             <div style="text-align:right;">
               <span style="background:rgba(255,255,255,0.15); padding:0.25rem 0.65rem; border-radius:999px; font-size:0.75rem; font-weight:800; border:1px solid rgba(212,175,55,0.4);" id="ramadan-location-pill">Pakistan Standard</span>
             </div>
+          </div>
+          <div style="margin-top:0.6rem; font-size:0.8rem; color:#fef08a; font-weight:700;" id="ramadan-countdown-pill">
+            <!-- Dynamic days countdown -->
           </div>
 
           <!-- Sehri & Iftar Duas -->
@@ -1741,6 +1987,315 @@
       </div>
     </section>
 
+    <!-- ==========================================================================
+         SCREEN 21: ISLAMIC (HIJRI) CALENDAR (#view-islamic-calendar)
+         ========================================================================== -->
+    <section id="view-islamic-calendar" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Islamic Calendar (تقویمِ ہجری)</div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="openHijriAdjustmentModal()" title="Ru'yat-e-Hilal Moon Adjustment">🌙</button>
+        </div>
+      </header>
+
+      <div class="cal-wrapper">
+        <!-- Hero Hijri Date Card -->
+        <div class="cal-hero-banner">
+          <div class="cal-header-badge-row">
+            <span class="cal-badge-pill" id="cal-hero-sacred-badge" style="display:none;">✨ حرمت والا مہینہ (Sacred Month)</span>
+            <span class="cal-badge-pill clickable" onclick="openHijriAdjustmentModal()" id="cal-offset-indicator">Ru'yat: 0 (Umm Al-Qura)</span>
+          </div>
+
+          <div id="cal-hero-hijri-date">
+            <!-- Dynamic Hijri Date -->
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.6rem; flex-wrap:wrap; gap:0.4rem;">
+            <div id="cal-hero-greg-date" style="font-size:0.85rem; opacity:0.9; font-weight:600;">
+              <!-- Dynamic Gregorian Date -->
+            </div>
+            <span class="cal-badge-pill" id="cal-hero-fasting-badge" style="display:none; background:rgba(212,175,55,0.25); border-color:var(--gold-primary);">
+              <!-- Fasting Badge -->
+            </span>
+          </div>
+        </div>
+
+        <!-- Mode Switcher (Monthly Calendar vs Upcoming Holy Events) -->
+        <div class="cal-tabs-switch-row">
+          <button class="cal-tab-btn active" id="cal-tab-hijri" onclick="setCalendarTab('hijri')">📅 Monthly Calendar (ماہانہ تقویم)</button>
+          <button class="cal-tab-btn" id="cal-tab-events" onclick="setCalendarTab('events')">⭐ Holy Events (اسلامی ایام و تہوار)</button>
+        </div>
+
+        <!-- Monthly Calendar View -->
+        <div id="calendar-monthly-view">
+          <!-- Month Switcher Card -->
+          <div class="cal-month-nav-card">
+            <button class="cal-nav-btn" onclick="prevHijriMonth()" title="Previous Month">‹</button>
+            <div style="text-align:center;">
+              <div id="cal-month-title" style="font-weight:800; font-size:1.1rem; color:var(--text-primary);">
+                <!-- Dynamic Month Title -->
+              </div>
+              <div id="cal-month-sub" style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
+                <!-- Description -->
+              </div>
+            </div>
+            <button class="cal-nav-btn" onclick="nextHijriMonth()" title="Next Month">›</button>
+          </div>
+
+          <!-- Quick Today Button & Month Jumping -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin:0.4rem 0;">
+            <button class="btn-arch-outline" style="padding:0.35rem 0.75rem; font-size:0.75rem; border-radius:999px;" onclick="jumpToTodayCalendar()">
+              <span>📍</span> <span>Jump to Today (آج)</span>
+            </button>
+            <div style="font-size:0.72rem; color:var(--text-muted);">
+              Tap any date to view prayer times & events
+            </div>
+          </div>
+
+          <!-- Calendar Days Grid Container -->
+          <div id="calendar-grid-container" style="margin-bottom:0.75rem;">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Selected Day Details Card -->
+          <div class="cal-day-card" id="cal-selected-day-card">
+            <!-- Populated by JS when tapping a day -->
+          </div>
+        </div>
+
+        <!-- Upcoming Holy Occasions View -->
+        <div id="calendar-events-view" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <div style="font-weight:800; font-size:0.95rem; color:var(--emerald-primary);">🌟 Major Islamic Events & Holy Days</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">Chronological order</div>
+          </div>
+          <div id="calendar-events-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 22: MUSLIM BABY NAMES & MEANINGS (#view-muslim-names)
+         ========================================================================== -->
+    <section id="view-muslim-names" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Muslim Names & Meanings</div>
+        <div class="header-right"></div>
+      </header>
+
+      <div class="names-wrapper">
+        <!-- Hero Header -->
+        <div class="names-hero-header">
+          <div style="font-family:var(--font-arabic); font-size:1.6rem; color:#fef08a; font-weight:700;">أَسْمَاءُ الْأَوْلَادِ وَالْبَنَاتِ</div>
+          <div style="font-family:var(--font-urdu); font-size:1.1rem; margin-top:2px;">بچوں اور بچیوں کے خوبصورت اسلامی نام مع معانی</div>
+          <div style="font-size:0.8rem; opacity:0.88; margin-top:0.25rem;">Authentic Muslim Baby Names with Urdu & English meanings, origin & Prophetic virtues.</div>
+        </div>
+
+        <!-- Search Bar with Instant Filter -->
+        <div class="names-search-bar">
+          <span style="font-size:1.2rem;">🔍</span>
+          <input type="text" id="muslim-name-search-input" class="names-search-input" placeholder="Type name (e.g. Muhammad, Fatima, Rayyan, Ayesha)..." oninput="onMuslimNameSearchInput(this.value)">
+          <button style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.1rem;" onclick="clearMuslimNameSearch()">✕</button>
+        </div>
+
+        <!-- Gender & Category Filter Chips -->
+        <div class="names-filter-row">
+          <button class="name-filter-chip active" id="names-filter-all" onclick="setNamesGenderFilter('all')">
+            <span>✨</span> <span>All Names (سب)</span>
+          </button>
+          <button class="name-filter-chip" id="names-filter-boy" onclick="setNamesGenderFilter('boy')">
+            <span>👦</span> <span>Boys (لڑکے)</span>
+          </button>
+          <button class="name-filter-chip" id="names-filter-girl" onclick="setNamesGenderFilter('girl')">
+            <span>👧</span> <span>Girls (لڑکیاں)</span>
+          </button>
+          <button class="name-filter-chip" id="names-filter-quranic" onclick="setNamesGenderFilter('quranic')">
+            <span>📖</span> <span>Quranic (قرآنی)</span>
+          </button>
+          <button class="name-filter-chip" id="names-filter-prophet" onclick="setNamesGenderFilter('prophet')">
+            <span>🕋</span> <span>Prophets & Sahaba</span>
+          </button>
+        </div>
+
+        <!-- Alphabetical A-Z Picker -->
+        <div>
+          <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:0.25rem;">Filter by Starting Letter:</div>
+          <div class="letter-picker-row">
+            <button class="letter-picker-btn active" id="letter-btn-ALL" onclick="setNamesLetterFilter('ALL')">All</button>
+            <button class="letter-picker-btn" id="letter-btn-A" onclick="setNamesLetterFilter('A')">A</button>
+            <button class="letter-picker-btn" id="letter-btn-B" onclick="setNamesLetterFilter('B')">B</button>
+            <button class="letter-picker-btn" id="letter-btn-D" onclick="setNamesLetterFilter('D')">D</button>
+            <button class="letter-picker-btn" id="letter-btn-F" onclick="setNamesLetterFilter('F')">F</button>
+            <button class="letter-picker-btn" id="letter-btn-H" onclick="setNamesLetterFilter('H')">H</button>
+            <button class="letter-picker-btn" id="letter-btn-I" onclick="setNamesLetterFilter('I')">I</button>
+            <button class="letter-picker-btn" id="letter-btn-J" onclick="setNamesLetterFilter('J')">J</button>
+            <button class="letter-picker-btn" id="letter-btn-K" onclick="setNamesLetterFilter('K')">K</button>
+            <button class="letter-picker-btn" id="letter-btn-M" onclick="setNamesLetterFilter('M')">M</button>
+            <button class="letter-picker-btn" id="letter-btn-N" onclick="setNamesLetterFilter('N')">N</button>
+            <button class="letter-picker-btn" id="letter-btn-R" onclick="setNamesLetterFilter('R')">R</button>
+            <button class="letter-picker-btn" id="letter-btn-S" onclick="setNamesLetterFilter('S')">S</button>
+            <button class="letter-picker-btn" id="letter-btn-T" onclick="setNamesLetterFilter('T')">T</button>
+            <button class="letter-picker-btn" id="letter-btn-U" onclick="setNamesLetterFilter('U')">U</button>
+            <button class="letter-picker-btn" id="letter-btn-Y" onclick="setNamesLetterFilter('Y')">Y</button>
+            <button class="letter-picker-btn" id="letter-btn-Z" onclick="setNamesLetterFilter('Z')">Z</button>
+          </div>
+        </div>
+
+        <!-- Count Indicator -->
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.8rem; font-weight:700; color:var(--emerald-primary);" id="names-results-count-badge">Loading names...</span>
+          <span style="font-size:0.72rem; color:var(--text-muted);">Tap 📋 to copy or 📤 to share</span>
+        </div>
+
+        <!-- Results List -->
+        <div id="muslim-names-results-list" style="display:flex; flex-direction:column; gap:0.75rem;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 23: THE SIX KALIMAS (چھ کلمے) (#view-six-kalimas)
+         ========================================================================== -->
+    <section id="view-six-kalimas" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Six Kalimas <span class="urdu-title-badge" dir="rtl">(چھ کلمے)</span></div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="shareAllKalimas()">🔗</button>
+        </div>
+      </header>
+
+      <div class="kalimas-wrapper">
+        <div class="names-banner-card" style="background: linear-gradient(135deg, #0e3e2f 0%, #064e3b 60%, #b45309 100%);">
+          <div style="font-family:var(--font-arabic); font-size:1.6rem; color:#fef08a; font-weight:700;">الكَلِمَاتُ السِّتَّة فِي الْإِسْلَام</div>
+          <div style="font-family:var(--font-urdu); font-size:1.15rem; margin-top:2px;">اسلام کے چھ بنیادی کلمے مع ترجمہ و رومن</div>
+          <div style="font-size:0.8rem; opacity:0.88; margin-top:0.25rem;">Arabic text with Harkat, Urdu & English meanings, and Roman transliteration.</div>
+        </div>
+
+        <div id="six-kalimas-list-container">
+          <!-- Rendered dynamically by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 24: DAILY ROUTINE MASNOON DUAS (مسنون دعائیں) (#view-daily-duas)
+         ========================================================================== -->
+    <section id="view-daily-duas" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Daily Duas <span class="urdu-title-badge" dir="rtl">(مسنون دعائیں)</span></div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="navigateTo('quran-search')">🔍</button>
+        </div>
+      </header>
+
+      <div class="duas-wrapper">
+        <div class="names-banner-card" style="background: linear-gradient(135deg, #064e3b 0%, #047857 70%, #d97706 100%);">
+          <div style="font-family:var(--font-arabic); font-size:1.6rem; color:#fef08a; font-weight:700;">حِصْنُ الْمُسْلِمِ مِنَ الْأَدْعِيَةِ النَّبَوِيَّة</div>
+          <div style="font-family:var(--font-urdu); font-size:1.15rem; margin-top:2px;">روزمرہ معمولات کی مستند مسنون دعائیں</div>
+          <div style="font-size:0.8rem; opacity:0.88; margin-top:0.25rem;">Authentic Supplications for Eating, Home, Sleep, Masjid, Travel & Protection.</div>
+        </div>
+
+        <div class="names-search-bar" style="margin-bottom:0.75rem;">
+          <span style="font-size:1.2rem;">🔍</span>
+          <input type="text" id="daily-duas-search-input" class="names-search-input" placeholder="Search Dua (eating, home, sleep, travel, حفاظت، کھانا)..." oninput="onDailyDuaSearchInput(this.value)">
+          <button style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.1rem;" onclick="clearDailyDuaSearch()">✕</button>
+        </div>
+
+        <div class="duas-cat-scroll" id="duas-cat-scroll-container">
+          <!-- Populated by JS -->
+        </div>
+
+        <div id="daily-duas-list-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 25: COMPLETE WUDU & TAHARAH GUIDE (طریقۂ وضو) (#view-wuzu-guide)
+         ========================================================================== -->
+    <section id="view-wuzu-guide" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Wudu Guide <span class="urdu-title-badge" dir="rtl">(طریقۂ وضو)</span></div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="shareWuduGuide()">🔗</button>
+        </div>
+      </header>
+
+      <div class="wudu-wrapper">
+        <div class="names-banner-card" style="background: linear-gradient(135deg, #1e3a8a 0%, #0369a1 60%, #059669 100%);">
+          <div style="font-family:var(--font-arabic); font-size:1.6rem; color:#fef08a; font-weight:700;">طَرِيقَةُ الْوُضُوءِ وَأَحْكَامُ الطَّهَارَة</div>
+          <div style="font-family:var(--font-urdu); font-size:1.15rem; margin-top:2px;">وضو کا مسنون طریقہ، فرائض، سنتیں اور نواقض</div>
+          <div style="font-size:0.8rem; opacity:0.88; margin-top:0.25rem;">Complete Islamic ablution guide according to authentic Sunnah with step-by-step illustrations.</div>
+        </div>
+
+        <div class="wudu-tabs-row">
+          <button class="wudu-tab-btn active" id="wudu-tab-faraiz" onclick="selectWuduTab('faraiz')">۴ لازمی فرائض (Faraiz)</button>
+          <button class="wudu-tab-btn" id="wudu-tab-steps" onclick="selectWuduTab('steps')">مرحلہ وار طریقہ (Steps)</button>
+          <button class="wudu-tab-btn" id="wudu-tab-sunnats" onclick="selectWuduTab('sunnats')">مسنون سنتیں (Sunnahs)</button>
+          <button class="wudu-tab-btn" id="wudu-tab-afterdua" onclick="selectWuduTab('afterdua')">وضو کے بعد کی دعا (Dua)</button>
+          <button class="wudu-tab-btn" id="wudu-tab-nawaqiz" onclick="selectWuduTab('nawaqiz')">نواقض (Break Rules)</button>
+          <button class="wudu-tab-btn" id="wudu-tab-ghusl" onclick="selectWuduTab('ghusl')">غسل کے فرائض (Ghusl)</button>
+        </div>
+
+        <div id="wudu-guide-content-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 26: COMPLETE STEP-BY-STEP NAMAZ GUIDE (طریقۂ نماز مع قرآنی تلاوت) (#view-namaz-guide)
+         ========================================================================== -->
+    <section id="view-namaz-guide" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()">←</button>
+        </div>
+        <div class="header-title">Namaz Guide <span class="urdu-title-badge" dir="rtl">(طریقۂ نماز مکمل)</span></div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="shareNamazGuide()">🔗</button>
+        </div>
+      </header>
+
+      <div class="wudu-wrapper">
+        <div class="names-banner-card" style="background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #0f766e 100%);">
+          <div style="font-family:var(--font-arabic); font-size:1.6rem; color:#fef08a; font-weight:700;">طَرِيقَةُ الصَّلَاةِ كَمَا صَلَّىٰ النَّبِيُّ ﷺ</div>
+          <div style="font-family:var(--font-urdu); font-size:1.2rem; margin-top:2px;">نماز کا مکمل و مسنون طریقہ مع تفصیلی احکام</div>
+          <div style="font-size:0.8rem; opacity:0.9; margin-top:0.25rem;">Complete step-by-step prayer guide with Surah examples, translations, and Rak'ats chart.</div>
+        </div>
+
+        <div class="wudu-tabs-row" id="namaz-tabs-row">
+          <button class="wudu-tab-btn active" id="namaz-tab-steps" onclick="selectNamazTab('steps')">مرحلہ وار طریقہ (Steps)</button>
+          <button class="wudu-tab-btn" id="namaz-tab-rakats" onclick="selectNamazTab('rakats')">رکعات چارٹ (Rak'ats)</button>
+          <button class="wudu-tab-btn" id="namaz-tab-gender" onclick="selectNamazTab('gender')">مرد و زن فرق (Men vs Women)</button>
+          <button class="wudu-tab-btn" id="namaz-tab-qunoot" onclick="selectNamazTab('qunoot')">دعائے قنوت و وتر (Witr)</button>
+        </div>
+
+        <div id="namaz-guide-content-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
   </div> <!-- End .app-container -->
 
   <!-- ==========================================================================
@@ -1768,6 +2323,62 @@
       <span>More</span>
     </button>
   </nav>
+
+  <!-- ==========================================================================
+       HOURLY & LIVE WEATHER FORECAST MODAL (#modal-hourly-weather)
+       ========================================================================== -->
+  <div class="modal-overlay" id="modal-hourly-weather" onclick="closeHourlyWeatherModal()">
+    <div class="modal-sheet-card" onclick="event.stopPropagation()" style="max-height:85vh; display:flex; flex-direction:column;">
+      <div class="modal-header-row">
+        <div class="modal-title-text" style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.3rem;">🌦️</span>
+          <span>لائیو موسم و گھنٹہ وار پیشن گوئی (Hourly Weather)</span>
+        </div>
+        <button class="btn-modal-close" onclick="closeHourlyWeatherModal()" title="Close">✕</button>
+      </div>
+
+      <div style="overflow-y:auto; padding:0.5rem 0 1rem 0; flex:1;">
+        <!-- Hero Weather Summary Card -->
+        <div class="weather-hero-card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div id="hourly-weather-city" style="font-size:1.15rem; font-weight:800; color:#fff;">📍 Auto-Detecting GPS...</div>
+              <div id="hourly-weather-main-desc" style="font-size:0.92rem; color:#a7f3d0; margin-top:3px; font-weight:700;">☀️ Clear Sky</div>
+            </div>
+            <div id="hourly-weather-icon-large" style="font-size:2.8rem; line-height:1;">☀️</div>
+          </div>
+
+          <div style="display:flex; align-items:baseline; gap:0.75rem; margin-top:0.85rem;">
+            <div id="hourly-weather-main-temp" style="font-size:3.2rem; font-weight:900; color:#fff; line-height:1;">28°C</div>
+            <div id="hourly-weather-high-low" style="font-size:0.85rem; color:#fef08a; font-weight:700;">High: 33°C • Low: 22°C</div>
+          </div>
+
+          <div style="display:flex; gap:1.25rem; margin-top:1rem; padding-top:0.75rem; border-top:1px solid rgba(255,255,255,0.18); font-size:0.82rem; color:#e2e8f0; font-weight:600; flex-wrap:wrap;">
+            <div id="hourly-weather-humidity">💧 Humidity: 45%</div>
+            <div id="hourly-weather-wind">💨 Wind: 14 km/h</div>
+            <div id="hourly-weather-status">🟢 Live GPS Updated</div>
+          </div>
+        </div>
+
+        <!-- Hourly Forecast Section -->
+        <div style="margin-top:1.25rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <div style="font-weight:800; font-size:0.95rem; color:var(--text-primary);">
+              آئندہ ۲۴ گھنٹوں کا موسم (Hourly Forecast)
+            </div>
+            <button onclick="refreshLiveWeather()" style="background:none; border:none; color:var(--emerald-primary); font-weight:800; font-size:0.82rem; cursor:pointer; display:flex; align-items:center; gap:3px;">
+              🔄 Refresh
+            </button>
+          </div>
+
+          <!-- Horizontal scrolling hourly cards -->
+          <div class="hourly-forecast-scroll" id="hourly-forecast-cards-container">
+            <!-- Dynamically populated by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ==========================================================================
        MODAL 1: RAMADAN & DAILY FASTING DUAS (#modal-fasting-duas)
@@ -1874,32 +2485,78 @@
        MODAL 3: EXACT LOCATION PINPOINT (#location-pinpoint-modal)
        ========================================================================== -->
   <div class="modal-overlay" id="location-pinpoint-modal" onclick="closePinpointModal()">
-    <div class="modal-sheet-card" onclick="event.stopPropagation()">
+    <div class="modal-sheet-card" onclick="event.stopPropagation()" style="max-height:88vh; display:flex; flex-direction:column;">
       <div class="modal-header-row">
-        <div class="modal-title-text">🎯 100% Exact Building Pinpoint</div>
+        <div class="modal-title-text" style="display:flex; align-items:center; gap:0.5rem;">
+          <span>🎯</span>
+          <span>100% Exact Building &amp; Location Pinpoint</span>
+        </div>
         <button class="btn-modal-close" onclick="closePinpointModal()">✕</button>
       </div>
-      <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.85rem;">
-        Deduct or search your exact building, pharmacy, shop, plaza, or sector with pinpoint precision:
-      </p>
 
-      <div style="position:relative; width:100%; margin-bottom:0.85rem;">
-        <input type="text" id="pinpoint-search-input" placeholder="e.g. D-Watson Pharmacy Main PWD Road Islamabad" style="width:100%; padding:0.85rem 1rem; border:1px solid var(--card-border); border-radius:12px; font-size:0.9rem; outline:none; background:var(--bg-page); color:var(--text-primary);">
-        <span id="pinpoint-search-spinner" style="display:none; position:absolute; right:14px; top:12px;">⏳</span>
-      </div>
+      <div style="overflow-y:auto; flex:1; padding:0 0.25rem 0.5rem 0.25rem;">
+        <!-- Currently Active Location Banner -->
+        <div style="background:var(--emerald-subtle); border:1px solid var(--emerald-accent); border-radius:12px; padding:0.65rem 0.9rem; margin-bottom:0.75rem; display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">Currently Active Location</div>
+            <div id="pinpoint-modal-current-name" style="font-size:0.88rem; font-weight:800; color:var(--text-primary); margin-top:2px;">Auto-Detecting GPS...</div>
+          </div>
+          <span style="font-size:1.3rem;">📍</span>
+        </div>
 
-      <div id="pinpoint-search-results" style="max-height:160px; overflow-y:auto; margin-bottom:1rem; display:flex; flex-direction:column; gap:0.5rem;"></div>
+        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.65rem;">
+          Search your exact building, plaza, shop, medical center or sector with pinpoint accuracy:
+        </p>
 
-      <div style="display:flex; flex-direction:column; gap:0.6rem;">
-        <button class="btn-arch-solid" style="border-radius:12px;" onclick="lockHardwareGpsSatellite()">
-          <span>🛰️</span> <span>Re-Lock Hardware Satellite GPS (&lt;10m)</span>
+        <!-- Search Bar with Search Button -->
+        <div style="display:flex; gap:0.45rem; margin-bottom:0.65rem;">
+          <div style="position:relative; flex:1;">
+            <input type="text" id="pinpoint-search-input" placeholder="e.g. Ghauri Town, PWD, Blue Area, Gulberg..." style="width:100%; padding:0.75rem 2.2rem 0.75rem 0.85rem; border:1px solid var(--card-border); border-radius:12px; font-size:0.85rem; outline:none; background:var(--bg-page); color:var(--text-primary);" onkeydown="if(event.key==='Enter') performPinpointSearch(this.value)">
+            <span id="pinpoint-search-spinner" style="display:none; position:absolute; right:10px; top:11px;">⏳</span>
+          </div>
+          <button class="btn-arch-solid" style="padding:0 0.85rem; border-radius:12px; flex-shrink:0; font-size:0.82rem;" onclick="performPinpointSearch(document.getElementById('pinpoint-search-input').value)">
+            <span>🔍 تلاش</span>
+          </button>
+        </div>
+
+        <!-- Live Search Results Box -->
+        <div id="pinpoint-search-results" style="max-height:160px; overflow-y:auto; margin-bottom:0.75rem; display:flex; flex-direction:column; gap:0.45rem;"></div>
+
+        <!-- Hardware GPS Re-Lock Button -->
+        <button class="btn-arch-solid" id="btn-pinpoint-gps" style="border-radius:12px; width:100%; justify-content:center; margin-bottom:0.85rem;" onclick="lockHardwareGpsSatellite()">
+          <span>🛰️</span> <span id="pinpoint-gps-status">Re-Lock Hardware Satellite GPS (&lt;10m)</span>
         </button>
-        <button class="btn-arch-outline" style="border-radius:12px; font-size:0.82rem;" onclick="selectPresetLocation('D-Watson Pharmacy, 35-C Block D, Main PWD Road Islamabad', 33.57142, 73.14546)">
-          <span>📍</span> <span>Quick Set: D-Watson Pharmacy, Main PWD Road Islamabad</span>
-        </button>
-        <button class="btn-arch-outline" style="border-radius:12px; font-size:0.82rem;" onclick="selectPresetLocation('Karachi, Pakistan', 24.8607, 67.0011)">
-          <span>📍</span> <span>Quick Set: Karachi, Pakistan</span>
-        </button>
+
+        <!-- Quick 1-Tap Presets Across Pakistan -->
+        <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.5rem; letter-spacing:0.5px;">
+          ⚡ Quick 1-Tap Presets (Pakistan)
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.45rem; margin-bottom:0.5rem;">
+          <button class="btn-arch-outline" style="border-radius:10px; font-size:0.78rem; padding:0.55rem 0.65rem; justify-content:flex-start;" onclick="selectPresetLocation('Ghauri Town, Islamabad', 33.6261, 73.1369)">
+            <span>📍</span> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Ghauri Town ISB</span>
+          </button>
+          <button class="btn-arch-outline" style="border-radius:10px; font-size:0.78rem; padding:0.55rem 0.65rem; justify-content:flex-start;" onclick="selectPresetLocation('D-Watson, Main PWD Road Islamabad', 33.5714, 73.1455)">
+            <span>📍</span> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">PWD Road ISB</span>
+          </button>
+          <button class="btn-arch-outline" style="border-radius:10px; font-size:0.78rem; padding:0.55rem 0.65rem; justify-content:flex-start;" onclick="selectPresetLocation('Blue Area, Islamabad', 33.7145, 73.0645)">
+            <span>📍</span> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Blue Area ISB</span>
+          </button>
+          <button class="btn-arch-outline" style="border-radius:10px; font-size:0.78rem; padding:0.55rem 0.65rem; justify-content:flex-start;" onclick="selectPresetLocation('Saddar, Rawalpindi', 33.5973, 73.0532)">
+            <span>📍</span> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Saddar Rawalpindi</span>
+          </button>
+          <button class="btn-arch-outline" style="border-radius:10px; font-size:0.78rem; padding:0.55rem 0.65rem; justify-content:flex-start;" onclick="selectPresetLocation('Gulberg, Lahore', 31.5204, 74.3587)">
+            <span>📍</span> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Gulberg Lahore</span>
+          </button>
+          <button class="btn-arch-outline" style="border-radius:10px; font-size:0.78rem; padding:0.55rem 0.65rem; justify-content:flex-start;" onclick="selectPresetLocation('Clifton / DHA, Karachi', 24.8138, 67.0300)">
+            <span>📍</span> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Clifton Karachi</span>
+          </button>
+          <button class="btn-arch-outline" style="border-radius:10px; font-size:0.78rem; padding:0.55rem 0.65rem; justify-content:flex-start;" onclick="selectPresetLocation('University Town, Peshawar', 34.0086, 71.4878)">
+            <span>📍</span> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Peshawar</span>
+          </button>
+          <button class="btn-arch-outline" style="border-radius:10px; font-size:0.78rem; padding:0.55rem 0.65rem; justify-content:flex-start;" onclick="selectPresetLocation('Jinnah Road, Quetta', 30.1798, 66.9750)">
+            <span>📍</span> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Quetta</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -2168,11 +2825,348 @@
     </div>
   </div>
 
+  <!-- ==========================================================================
+       MODAL: HIJRI DATE ADJUSTMENT (RU'YAT-E-HILAL MOON SIGHTING)
+       ========================================================================== -->
+  <div class="modal-overlay" id="modal-hijri-adjustment" onclick="closeHijriAdjustmentModal()">
+    <div class="modal-sheet-card" onclick="event.stopPropagation()">
+      <div class="modal-header-row">
+        <div class="modal-title-text" style="display:flex; align-items:center; gap:0.4rem;">
+          <span>🌙</span> <span>Hijri Date Adjustment (رویتِ ہلال)</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeHijriAdjustmentModal()">✕</button>
+      </div>
+
+      <p style="font-size:0.85rem; color:var(--text-secondary); line-height:1.5; margin-bottom:0.75rem;">
+        Islamic lunar months depend on local moon sighting (Ru'yat-e-Hilal). If the date in your country (Pakistan, Saudi Arabia, etc.) differs by 1 or 2 days, adjust below:
+      </p>
+
+      <div class="offset-chips-grid">
+        <div class="offset-chip" data-offset="-2" onclick="selectOffsetChip(-2)">
+          <span class="offset-num">-2</span>
+          <span class="offset-label">Days</span>
+        </div>
+        <div class="offset-chip" data-offset="-1" onclick="selectOffsetChip(-1)">
+          <span class="offset-num">-1</span>
+          <span class="offset-label">Day</span>
+        </div>
+        <div class="offset-chip active" data-offset="0" onclick="selectOffsetChip(0)">
+          <span class="offset-num">0</span>
+          <span class="offset-label">Standard</span>
+        </div>
+        <div class="offset-chip" data-offset="1" onclick="selectOffsetChip(1)">
+          <span class="offset-num">+1</span>
+          <span class="offset-label">Day</span>
+        </div>
+        <div class="offset-chip" data-offset="2" onclick="selectOffsetChip(2)">
+          <span class="offset-num">+2</span>
+          <span class="offset-label">Days</span>
+        </div>
+      </div>
+
+      <div style="background:var(--bg-page); padding:0.75rem; border-radius:10px; font-size:0.78rem; color:var(--text-muted); margin-bottom:1rem; border:1px solid var(--card-border);">
+        ✓ This adjustment immediately updates the Islamic Calendar, Home Screen, and Prayer Timings across the entire app.
+      </div>
+
+      <button class="btn-arch-solid" style="width:100%; justify-content:center;" onclick="closeHijriAdjustmentModal()">
+        <span>Done / محفوظ کریں</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- LUXURY ISLAMIC THEME PICKER MODAL SHEET -->
+  <div class="modal-overlay" id="modal-theme-picker" onclick="closeThemePickerModal()">
+    <div class="modal-sheet-card" onclick="event.stopPropagation()" style="max-height:85vh; display:flex; flex-direction:column;">
+      <div class="modal-header-row">
+        <div class="modal-title-text" style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.3rem;">🎨</span>
+          <span>خوبصورت اسلامی تھیمز (Select Color Theme)</span>
+        </div>
+        <button class="btn-modal-close" onclick="closeThemePickerModal()">✕</button>
+      </div>
+
+      <div style="padding: 0.5rem 1rem 1.25rem 1rem; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:0.75rem;">
+        <div class="theme-choice-card" id="theme-card-emerald" onclick="selectTheme('emerald')">
+          <div class="theme-preview-dot" style="background: linear-gradient(135deg, #0e3e2f, #d4af37);"></div>
+          <div class="theme-info-col">
+            <div class="theme-name">Royal Emerald &amp; Gold (زمردی شاہی)</div>
+            <div class="theme-sub">روایتی اسلامی زمردی سبز اور سنہرا اعجاز • Classic</div>
+          </div>
+          <span class="theme-check-icon">✓</span>
+        </div>
+
+        <div class="theme-choice-card" id="theme-card-sapphire" onclick="selectTheme('sapphire')">
+          <div class="theme-preview-dot" style="background: linear-gradient(135deg, #0b1f3a, #38bdf8);"></div>
+          <div class="theme-info-col">
+            <div class="theme-name">Midnight Sapphire &amp; Cyan (نیلم فلکی)</div>
+            <div class="theme-sub">گہرا نیلا آسمانی رنگ اور نوری ستارے • Deep Blue</div>
+          </div>
+          <span class="theme-check-icon">✓</span>
+        </div>
+
+        <div class="theme-choice-card" id="theme-card-amethyst" onclick="selectTheme('amethyst')">
+          <div class="theme-preview-dot" style="background: linear-gradient(135deg, #2e1065, #c084fc);"></div>
+          <div class="theme-info-col">
+            <div class="theme-name">Imperial Purple &amp; Velvet (شاہی یاقوت)</div>
+            <div class="theme-sub">شاہی جامنی اور مخملی پرتعیش حسن • Royal Purple</div>
+          </div>
+          <span class="theme-check-icon">✓</span>
+        </div>
+
+        <div class="theme-choice-card" id="theme-card-amber" onclick="selectTheme('amber')">
+          <div class="theme-preview-dot" style="background: linear-gradient(135deg, #78350f, #f59e0b);"></div>
+          <div class="theme-info-col">
+            <div class="theme-name">Desert Sunset Amber (عنبر و صحرا)</div>
+            <div class="theme-sub">سنہری عنبر، گرم صحرائی شام اور کانسی • Warm Gold</div>
+          </div>
+          <span class="theme-check-icon">✓</span>
+        </div>
+
+        <div class="theme-choice-card" id="theme-card-rosegold" onclick="selectTheme('rosegold')">
+          <div class="theme-preview-dot" style="background: linear-gradient(135deg, #4c1d2e, #fb7185);"></div>
+          <div class="theme-info-col">
+            <div class="theme-name">Rose Gold &amp; Obsidian (گلاب و شبستان)</div>
+            <div class="theme-sub">خوبصورت گلابی سونا اور تاریک شبستان • Rose Noir</div>
+          </div>
+          <span class="theme-check-icon">✓</span>
+        </div>
+
+        <div class="theme-choice-card" id="theme-card-light" onclick="selectTheme('light')">
+          <div class="theme-preview-dot" style="background: linear-gradient(135deg, #ffffff, #0e3e2f); border: 1.5px solid #cbd5e1;"></div>
+          <div class="theme-info-col">
+            <div class="theme-name">Pure Daylight Minimal (نورِ سپید)</div>
+            <div class="theme-sub">روشن، شفاف اور پرسکون سفید دن کا انداز • Bright Minimal</div>
+          </div>
+          <span class="theme-check-icon">✓</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       PAKISTANI AUTHENTIC ZAKAT CALCULATOR MODAL (مستند زکوٰۃ کیلکولیٹر)
+       ====================================================================== -->
+  <div class="modal-overlay" id="modal-zakat-calculator" onclick="closeZakatModal()">
+    <div class="modal-sheet-card" onclick="event.stopPropagation()" style="max-height:88vh; display:flex; flex-direction:column;">
+      <div class="modal-header-row">
+        <div class="modal-title-text" style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.3rem;">💰</span>
+          <span>Zakat Calculator (مستند زکوٰۃ کیلکولیٹر)</span>
+        </div>
+        <button class="btn-modal-close" onclick="closeZakatModal()">✕</button>
+      </div>
+
+      <div style="padding: 0.75rem 1rem 1.25rem 1rem; overflow-y:auto; flex:1;">
+        <div style="background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); border-radius:12px; padding:0.75rem; font-size:0.78rem; line-height:1.55; color:var(--text-secondary); margin-bottom:0.9rem;">
+          <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.25rem;">📖 Zakat Nisab (نصابِ زکوٰۃ):</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.35rem;">Zakat (2.5%) is obligatory for every Muslim whose net wealth exceeds 52.5 Tolas Silver (~180,000 PKR) or 7.5 Tolas Gold for a full lunar year.</div>
+          <div style="direction:rtl; font-size:0.78rem;" dir="rtl">زکوٰۃ ہر صاحبِ نصاب مسلمان پر فرض ہے۔ نصاب ۵۲.۵ تولہ چاندی (تقریباً <strong>۱۸۰,۰۰۰ روپے</strong>) یا ۷.۵ تولہ سونا ہے۔ سال گزرنے پر کل مالیت پر <strong>۲.۵٪</strong> زکوٰۃ ادا کرنا فرض ہے۔</div>
+        </div>
+
+        <form class="zakat-calc-form" onsubmit="event.preventDefault(); calculateZakatPKR();">
+          <!-- Gold -->
+          <div class="zakat-input-group">
+            <label class="zakat-input-label">
+              <span>Gold Value / سونا کی کل مالیت</span>
+              <span style="font-size:0.7rem; color:var(--text-muted);">Jewelry / Coins (زیورات)</span>
+            </label>
+            <div class="zakat-field-row">
+              <input type="number" id="zakat-gold-val" class="zakat-input-field" placeholder="0" min="0" oninput="calculateZakatPKR()">
+              <span class="zakat-unit-badge">PKR</span>
+            </div>
+          </div>
+
+          <!-- Silver -->
+          <div class="zakat-input-group">
+            <label class="zakat-input-label">
+              <span>Silver Value / چاندی کی کل مالیت</span>
+              <span style="font-size:0.7rem; color:var(--text-muted);">Silverware / Ornaments</span>
+            </label>
+            <div class="zakat-field-row">
+              <input type="number" id="zakat-silver-val" class="zakat-input-field" placeholder="0" min="0" oninput="calculateZakatPKR()">
+              <span class="zakat-unit-badge">PKR</span>
+            </div>
+          </div>
+
+          <!-- Cash in Hand & Bank -->
+          <div class="zakat-input-group">
+            <label class="zakat-input-label">
+              <span>Cash &amp; Bank Balance / نقدی و بینک</span>
+              <span style="font-size:0.7rem; color:var(--text-muted);">Savings &amp; Currency (سیونگ)</span>
+            </label>
+            <div class="zakat-field-row">
+              <input type="number" id="zakat-cash-val" class="zakat-input-field" placeholder="0" min="0" oninput="calculateZakatPKR()">
+              <span class="zakat-unit-badge">PKR</span>
+            </div>
+          </div>
+
+          <!-- Business Goods / Inventory -->
+          <div class="zakat-input-group">
+            <label class="zakat-input-label">
+              <span>Business Merchandise / مالِ تجارت</span>
+              <span style="font-size:0.7rem; color:var(--text-muted);">Store Goods / Inventory</span>
+            </label>
+            <div class="zakat-field-row">
+              <input type="number" id="zakat-stock-val" class="zakat-input-field" placeholder="0" min="0" oninput="calculateZakatPKR()">
+              <span class="zakat-unit-badge">PKR</span>
+            </div>
+          </div>
+
+          <!-- Loans Given to Others -->
+          <div class="zakat-input-group">
+            <label class="zakat-input-label">
+              <span>Receivable Loans / قرض واپسی کی امید</span>
+              <span style="font-size:0.7rem; color:var(--text-muted);">Money Lent to Others</span>
+            </label>
+            <div class="zakat-field-row">
+              <input type="number" id="zakat-loan-rec-val" class="zakat-input-field" placeholder="0" min="0" oninput="calculateZakatPKR()">
+              <span class="zakat-unit-badge">PKR</span>
+            </div>
+          </div>
+
+          <!-- Deductions (Debts / Immediate liabilities) -->
+          <div class="zakat-input-group" style="margin-top:0.4rem;">
+            <label class="zakat-input-label" style="color:#ef4444;">
+              <span>Deduct: Debts &amp; Bills / منہا: واجب الادا قرض</span>
+              <span style="font-size:0.7rem; color:var(--text-muted);">Immediate Liabilities</span>
+            </label>
+            <div class="zakat-field-row">
+              <input type="number" id="zakat-debt-val" class="zakat-input-field" placeholder="0" min="0" oninput="calculateZakatPKR()" style="border-color:rgba(239,68,68,0.4);">
+              <span class="zakat-unit-badge" style="color:#ef4444;">- PKR</span>
+            </div>
+          </div>
+
+          <!-- Nisab Setting Threshold -->
+          <div class="zakat-input-group" style="margin-top:0.4rem;">
+            <label class="zakat-input-label">
+              <span>Silver Nisab Threshold / نصابِ چاندی کا تخمینہ</span>
+              <span style="font-size:0.7rem; color:var(--emerald-accent);">Current Standard</span>
+            </label>
+            <div class="zakat-field-row">
+              <input type="number" id="zakat-nisab-val" class="zakat-input-field" value="180000" min="0" oninput="calculateZakatPKR()">
+              <span class="zakat-unit-badge">PKR</span>
+            </div>
+          </div>
+
+          <!-- Calculation Summary Box -->
+          <div class="zakat-result-summary" id="zakat-summary-box">
+            <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; opacity:0.85;">Net Zakatable Assets (کل قابلِ زکوٰۃ اثاثے)</div>
+            <div style="font-size:1.15rem; font-weight:700;" id="zakat-net-assets-text">PKR 0</div>
+            
+            <div style="height:1px; background:rgba(255,255,255,0.15); margin:0.6rem 0;"></div>
+            
+            <div style="font-size:0.82rem; opacity:0.9;" id="zakat-status-note">Checking Nisab Threshold...</div>
+            <div class="zakat-result-amount" id="zakat-due-amount">PKR 0</div>
+            <div style="font-size:0.75rem; opacity:0.8;">Total Zakat Due (2.5% سالانہ واجب الادا رقم)</div>
+          </div>
+
+          <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+            <button type="button" class="btn-arch-outline" style="flex:1; justify-content:center; border-radius:10px;" onclick="resetZakatForm()">
+              <span>Reset / ری سیٹ</span>
+            </button>
+            <button type="button" class="btn-arch-solid" style="flex:2; justify-content:center; border-radius:10px;" onclick="calculateZakatPKR(true)">
+              <span>Calculate Zakat / حساب مکمل کریں ✓</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       WHATSAPP ISLAMIC STATUS / POSTER MAKER MODAL (اسلامی کارڈ میکر)
+       ====================================================================== -->
+  <div class="modal-overlay" id="modal-card-generator" onclick="closeCardGenerator()">
+    <div class="modal-sheet-card" onclick="event.stopPropagation()" style="max-height:92vh; display:flex; flex-direction:column;">
+      <div class="modal-header-row">
+        <div class="modal-title-text" style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.3rem;">📸</span>
+          <span>Status &amp; Card Maker (اسلامی اسٹیٹس میکر)</span>
+        </div>
+        <button class="btn-modal-close" onclick="closeCardGenerator()">✕</button>
+      </div>
+
+      <div style="padding: 0.6rem 1rem 1.25rem 1rem; overflow-y:auto; flex:1; display:flex; flex-direction:column; align-items:center; gap:0.75rem;">
+        <!-- Canvas Status Preview -->
+        <canvas id="islamic-card-canvas" width="1080" height="1920" class="status-card-canvas"></canvas>
+
+        <div style="display:flex; gap:0.5rem; width:100%; justify-content:center;">
+          <button class="theme-choice-btn" id="card-theme-emerald" onclick="setCardTheme('emerald')" style="padding:0.4rem 0.8rem; border-radius:8px; font-size:0.75rem; border:1px solid var(--card-border); background:rgba(14,62,47,0.3); color:var(--text-primary); cursor:pointer;">
+            🟢 Royal Emerald (زمرد)
+          </button>
+          <button class="theme-choice-btn" id="card-theme-sapphire" onclick="setCardTheme('sapphire')" style="padding:0.4rem 0.8rem; border-radius:8px; font-size:0.75rem; border:1px solid var(--card-border); background:rgba(11,31,58,0.3); color:var(--text-primary); cursor:pointer;">
+            🔵 Sapphire Blue (نیلم)
+          </button>
+          <button class="theme-choice-btn" id="card-theme-amber" onclick="setCardTheme('amber')" style="padding:0.4rem 0.8rem; border-radius:8px; font-size:0.75rem; border:1px solid var(--card-border); background:rgba(120,53,15,0.3); color:var(--text-primary); cursor:pointer;">
+            🟡 Golden Amber (عنبر)
+          </button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display:flex; flex-direction:column; gap:0.5rem; width:100%;">
+          <button class="btn-arch-solid" style="width:100%; justify-content:center; padding:0.75rem; border-radius:12px; font-size:0.92rem; background:linear-gradient(135deg, #25D366, #128C7E); border-color:#25D366;" onclick="shareIslamicCard()">
+            <span>📲 Share to WhatsApp (واٹس ایپ پر شیئر کریں)</span>
+          </button>
+          <button class="btn-arch-outline" style="width:100%; justify-content:center; padding:0.65rem; border-radius:12px; font-size:0.85rem;" onclick="downloadIslamicCard()">
+            <span>📥 Save Image to Gallery (گیلری میں محفوظ کریں)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       ADVANCE OFFLINE CACHE MANAGER MODAL (جدید آف لائن کیشے سسٹم)
+       ====================================================================== -->
+  <div class="modal-overlay" id="modal-cache-manager" onclick="closeCacheManagerModal()">
+    <div class="modal-sheet-card" onclick="event.stopPropagation()">
+      <div class="modal-header-row">
+        <div class="modal-title-text" style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.3rem;">⚡</span>
+          <span>Advance Offline Cache (آف لائن کیشے)</span>
+        </div>
+        <button class="btn-modal-close" onclick="closeCacheManagerModal()">✕</button>
+      </div>
+
+      <div style="padding: 1rem 1.25rem 1.5rem 1.25rem;">
+        <div style="background:var(--emerald-subtle); border:1px solid var(--card-border); border-radius:14px; padding:1rem; margin-bottom:1rem;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+            <span style="font-weight:800; font-size:0.95rem; color:var(--emerald-primary);">Automatic Offline Storage</span>
+            <span style="background:rgba(16,185,129,0.18); color:#10b981; font-size:0.72rem; font-weight:800; padding:2px 8px; border-radius:999px;">● Active</span>
+          </div>
+          <p style="font-size:0.78rem; color:var(--text-secondary); line-height:1.5; margin-bottom:0.75rem;">
+            Noor al-Islam automatically saves everything you load so it works 100% offline. Every Ayah recitation played, prayer time calculation, and daily content is permanently saved to your device.
+          </p>
+
+          <div id="cache-stats-details" style="background:var(--card-bg); border-radius:10px; padding:0.75rem; border:1px solid var(--card-border);">
+            <div style="font-size:0.82rem; color:var(--text-muted);">Calculating offline cache...</div>
+          </div>
+        </div>
+
+        <!-- Cache Action Buttons -->
+        <div style="display:flex; flex-direction:column; gap:0.6rem;">
+          <button class="btn-arch-solid" style="width:100%; justify-content:center; padding:0.75rem; border-radius:12px; font-size:0.88rem;" onclick="preCachePopularSurahs()">
+            <span>📥 Pre-Cache Popular Surahs Audio (اہم سورتیں محفوظ کریں)</span>
+          </button>
+          <button class="btn-arch-outline" style="width:100%; justify-content:center; padding:0.65rem; border-radius:12px; font-size:0.82rem;" onclick="refreshOfflineDataNow()">
+            <span>🔄 Refresh Offline Data Now (ڈیٹا کیشے اپ ڈیٹ کریں)</span>
+          </button>
+          <button class="btn-arch-outline" style="width:100%; justify-content:center; padding:0.65rem; border-radius:12px; font-size:0.82rem; color:#ef4444; border-color:rgba(239,68,68,0.4);" onclick="AdvanceCacheSystem.clearAllCache()">
+            <span>🗑️ Clear Offline Audio Cache (کیشے خالی کریں)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- SCRIPTS -->
   <script src="js/quran-data.js"></script>
   <script src="js/quran-indopak-data.js"></script>
   <script src="js/quran-uthmani-data.js"></script>
   <script src="js/prayer-engine.js"></script>
+  <script src="js/islamic-calendar.js"></script>
+  <script src="js/muslim-names-data.js"></script>
+  <script src="js/islamic-essentials-data.js"></script>
   <script src="js/app.js"></script>
   <script>
     (function() {
