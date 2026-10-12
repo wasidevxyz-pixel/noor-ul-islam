@@ -11,7 +11,7 @@
 // Once loaded, data & audio are stored on disk and work completely offline
 // ==========================================================================
 const AdvanceCacheSystem = {
-  CACHE_NAME: 'noor_al_islam_audio_v2',
+  CACHE_NAME: 'noor_al_islam_audio_v3',
   STORAGE_PREFIX: 'noor_cache_',
 
   hasCacheApi() {
@@ -19,10 +19,27 @@ const AdvanceCacheSystem = {
   },
 
   /**
+   * Automatically removes obsolete or corrupted cache buckets from previous versions
+   */
+  async cleanOldCaches() {
+    if (!this.hasCacheApi()) return;
+    try {
+      const keys = await caches.keys();
+      for (const k of keys) {
+        if (k !== this.CACHE_NAME && k.startsWith('noor_al_islam_audio_')) {
+          console.log(`[AdvanceCache] Purging outdated audio cache: ${k}`);
+          await caches.delete(k);
+        }
+      }
+    } catch(e) {
+      console.warn('[AdvanceCache] Error pruning old caches:', e);
+    }
+  },
+
+  /**
    * 1. AUDIO CACHE INTERCEPTOR:
-   * Checks CacheStorage for audio file. If found, returns local Blob URL
-   * that plays instantly with 0ms buffering and zero internet usage.
-   * If not cached, streams audio while caching it permanently on disk!
+   * Checks CacheStorage for valid audio file. If found and non-empty (>10KB), returns local Blob URL.
+   * If cached response is corrupted/empty, deletes it and returns the live URL directly.
    */
   async getOrCacheAudio(audioUrl) {
     if (!audioUrl || typeof audioUrl !== 'string') return audioUrl;
@@ -33,21 +50,33 @@ const AdvanceCacheSystem = {
       const cachedResponse = await cache.match(audioUrl);
 
       if (cachedResponse) {
-        console.log(`[AdvanceCache] Playing from offline disk cache: ${audioUrl}`);
         const blob = await cachedResponse.blob();
-        return URL.createObjectURL(blob);
+        if (blob && blob.size > 10240) {
+          console.log(`[AdvanceCache] Playing from verified offline cache (${blob.size} bytes): ${audioUrl}`);
+          return URL.createObjectURL(blob);
+        } else {
+          // Corrupt or truncated cache entry — delete it immediately so live stream plays
+          console.warn(`[AdvanceCache] Removing corrupt cache entry (${blob ? blob.size : 0} bytes): ${audioUrl}`);
+          await cache.delete(audioUrl);
+        }
       }
 
-      // Not yet cached: download in background & persist to cache
+      // Live streaming continues immediately while caching valid audio in background
       fetch(audioUrl, { mode: 'cors' }).then(async (response) => {
-        if (response && response.ok) {
+        if (response && response.status === 200 && response.ok) {
           const clone = response.clone();
-          await cache.put(audioUrl, clone);
-          console.log(`[AdvanceCache] Successfully cached audio offline: ${audioUrl}`);
-          this.updateCacheStatsUI();
+          const b = await clone.blob();
+          if (b && b.size > 10240) {
+            await cache.put(audioUrl, new Response(b, {
+              status: 200,
+              headers: { 'Content-Type': 'audio/mpeg' }
+            }));
+            console.log(`[AdvanceCache] Successfully cached verified audio offline (${b.size} bytes): ${audioUrl}`);
+            this.updateCacheStatsUI();
+          }
         }
-      }).catch(err => {
-        console.warn(`[AdvanceCache] Background audio cache note:`, err);
+      }).catch(() => {
+        // Background cache download error ignored - live streaming works seamlessly
       });
 
       return audioUrl;
@@ -1062,6 +1091,9 @@ function initApp() {
   if (typeof initNamazTracker === 'function') initNamazTracker();
   if (typeof initHomeAzkar === 'function') initHomeAzkar();
   if (typeof updateResumeReadingCards === 'function') updateResumeReadingCards();
+  if (typeof AdvanceCacheSystem !== 'undefined' && AdvanceCacheSystem.cleanOldCaches) {
+    AdvanceCacheSystem.cleanOldCaches();
+  }
 
   // Sync alarm settings with Android AlarmManager immediately on launch
   if (window.AndroidApp && typeof window.AndroidApp.updateSettings === 'function') {
