@@ -15,12 +15,15 @@ import android.webkit.ConsoleMessage
 import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.webkit.WebViewAssetLoader
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.nooralislam.app.service.AzanAudioPlayer
@@ -46,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var qiblaCompassManager: QiblaCompassManager
         private set
     private var isCompassActive: Boolean = false
+    private var nativeBridge: NativeBridge? = null
 
     private var lastBackPressTime: Long = 0
 
@@ -124,12 +128,18 @@ class MainActivity : AppCompatActivity() {
         settings.setGeolocationEnabled(true)
         settings.allowFileAccess = true
         settings.allowContentAccess = true
+        @Suppress("DEPRECATION")
+        settings.allowFileAccessFromFileURLs = true
+        @Suppress("DEPRECATION")
+        settings.allowUniversalAccessFromFileURLs = true
         settings.mediaPlaybackRequiresUserGesture = false
         settings.builtInZoomControls = false
         settings.displayZoomControls = false
         settings.useWideViewPort = false
         settings.loadWithOverviewMode = false
-        settings.cacheMode = WebSettings.LOAD_DEFAULT
+        settings.databaseEnabled = true
+        val connectivityManager = getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
+        settings.cacheMode = WebSettings.LOAD_NO_CACHE
 
         webView.isHorizontalScrollBarEnabled = false
         webView.overScrollMode = View.OVER_SCROLL_NEVER
@@ -140,11 +150,24 @@ class MainActivity : AppCompatActivity() {
 
         // Register NativeBridge as AndroidApp
         val bridge = NativeBridge(this)
+        nativeBridge = bridge
         webView.addJavascriptInterface(bridge, "AndroidApp")
 
+        val assetLoader = WebViewAssetLoader.Builder()
+            .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+            .build()
+
         webView.webViewClient = object : WebViewClient() {
+            override fun shouldInterceptRequest(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): WebResourceResponse? {
+                val requestUrl = request?.url ?: return null
+                return assetLoader.shouldInterceptRequest(requestUrl)
+            }
+
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                if (url.startsWith("file:///android_asset/")) {
+                if (url.startsWith("file:///android_asset/") || url.startsWith("https://appassets.androidplatform.net/")) {
                     return false
                 }
                 return try {
@@ -163,6 +186,14 @@ class MainActivity : AppCompatActivity() {
                 failingUrl: String?
             ) {
                 Log.e(TAG, "WebView error: $errorCode: $description (URL: $failingUrl)")
+            }
+
+            override fun onReceivedSslError(
+                view: WebView?,
+                handler: android.webkit.SslErrorHandler?,
+                error: android.net.http.SslError?
+            ) {
+                handler?.proceed()
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
@@ -276,6 +307,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun notifyWebviewAudioEnded(trackId: String) {
+        webView.post {
+            webView.evaluateJavascript("if(window.onNativeAudioEnded){ window.onNativeAudioEnded('$trackId'); }", null)
+        }
+    }
+
+    fun notifyWebviewAudioError(trackId: String) {
+        webView.post {
+            webView.evaluateJavascript("if(window.onNativeAudioError){ window.onNativeAudioError('$trackId'); }", null)
+        }
+    }
+
     fun startQiblaCompass() {
         isCompassActive = true
         val loc = viewModel?.currentLocation?.value
@@ -308,7 +351,7 @@ class MainActivity : AppCompatActivity() {
                     finish()
                 } else {
                     lastBackPressTime = System.currentTimeMillis()
-                    Toast.makeText(this, "Press back again to exit Noor Al-Islam", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Press back again to exit Noor Al Islam", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -328,9 +371,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun notifyWebviewSpeechEnded() {
+        webView.post {
+            webView.evaluateJavascript("if(typeof onNativeSpeechEnded === 'function') onNativeSpeechEnded();", null)
+        }
+    }
+
+    fun clearAppWebCache() {
+        runOnUiThread {
+            webView.clearCache(true)
+        }
+    }
+
     override fun onDestroy() {
         qiblaCompassManager.stop()
         AzanAudioPlayer.stop()
+        nativeBridge?.destroy()
         webView.destroy()
         super.onDestroy()
     }

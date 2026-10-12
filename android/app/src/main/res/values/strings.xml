@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Noor Al-Islam</string>
+    <string name="app_name">Noor Al Islam</string>
+    <string name="play_store_title">Noor Al Islam: Quran &amp; Azan</string>
+    <string name="app_tagline">Your Daily Companion in Islam</string>
+    <string name="developer_credit">Designed by BAS Software Bilal Shah</string>
 </resources>

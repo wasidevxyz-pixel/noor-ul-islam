@@ -2648,7 +2648,7 @@ function shareVerseAyah(sNum, verseNum) {
   const arText = card ? (card.querySelector('.verse-arabic-text')?.innerText || '') : '';
   const urduText = card ? (card.querySelector('.verse-urdu-text')?.innerText || '') : '';
   const engText = card ? (card.querySelector('.verse-english-text')?.innerText || '') : '';
-  const text = `📖 Al-Quran [${sNum}:${verseNum}]:\n\n${arText}\n\n${urduText}${engText ? '\n\n' + engText : ''}\n\n— Noor Al-Islam App`;
+  const text = `📖 Al-Quran [${sNum}:${verseNum}]:\n\n${arText}\n\n${urduText}${engText ? '\n\n' + engText : ''}\n\n— Noor Al Islam (Your Daily Companion in Islam)`;
   if (navigator.share) {
     navigator.share({ title: `Ayah ${sNum}:${verseNum}`, text: text });
   } else {
@@ -4613,7 +4613,7 @@ window.loadNextAyatOfDay = loadNextAyatOfDay;
 function shareCurrentAyat() {
   if (typeof DAILY_AYATS === 'undefined' || !DAILY_AYATS.length) return;
   const a = DAILY_AYATS[state.ayatIndex];
-  const shareText = `✨ Ayat of the Day ${a.ref}:\n\n${sanitizeQuranText(a.arabic)}\n\n${a.urdu}\n\n${a.english}\n\n— Noor Al-Islam App`;
+  const shareText = `✨ Ayat of the Day ${a.ref}:\n\n${sanitizeQuranText(a.arabic)}\n\n${a.urdu}\n\n${a.english}\n\n— Noor Al Islam (Your Daily Companion in Islam)`;
   if (navigator.share) {
     navigator.share({ title: 'Ayat of the Day', text: shareText });
   } else {
@@ -4663,7 +4663,7 @@ window.loadNextHadithOfDay = loadNextHadithOfDay;
 function shareCurrentHadith() {
   if (typeof DAILY_HADITHS === 'undefined' || !DAILY_HADITHS.length) return;
   const h = DAILY_HADITHS[state.hadithIndex];
-  const shareText = `📜 Hadith of the Day ${h.ref}:\n\n${h.arabic}\n\n${h.urdu}\n\n${h.english}\n\n— Noor Al-Islam App`;
+  const shareText = `📜 Hadith of the Day ${h.ref}:\n\n${h.arabic}\n\n${h.urdu}\n\n${h.english}\n\n— Noor Al Islam (Your Daily Companion in Islam)`;
   if (navigator.share) {
     navigator.share({ title: 'Hadith of the Day', text: shareText });
   } else {
@@ -4835,7 +4835,7 @@ window.copyHadithText = copyHadithText;
 function shareHadithText(idx) {
   const h = DAILY_HADITHS[idx];
   if (!h) return;
-  const text = `📜 Hadith ${h.ref}:\n\n${h.arabic}\n\n${h.urdu}\n\n${h.english}\n\n— Noor Al-Islam App`;
+  const text = `📜 Hadith ${h.ref}:\n\n${h.arabic}\n\n${h.urdu}\n\n${h.english}\n\n— Noor Al Islam (Your Daily Companion in Islam)`;
   if (navigator.share) {
     navigator.share({ title: 'Hadith of the Prophet ﷺ', text: text });
   } else {
@@ -5869,7 +5869,7 @@ function copyKalimaText(num) {
   if (typeof SIX_KALIMAS_DATA === 'undefined') return;
   const k = SIX_KALIMAS_DATA.find(item => (item.number === num || item.id === num));
   if (!k) return;
-  const full = `${k.nameUrdu} (${k.nameEnglish})\n\n${k.arabic}\n\nاردو: ${k.urdu}\n\nEnglish: ${k.english}\n\n- Noor Al-Islam App`;
+  const full = `${k.nameUrdu} (${k.nameEnglish})\n\n${k.arabic}\n\nاردو: ${k.urdu}\n\nEnglish: ${k.english}\n\n— Noor Al Islam (Your Daily Companion in Islam)`;
   navigator.clipboard ? navigator.clipboard.writeText(full).then(() => showAppToast('Kalima text copied!')) : showAppToast('Copied');
 }
 window.copyKalimaText = copyKalimaText;
@@ -5888,7 +5888,7 @@ function shareKalimaText(num) {
 window.shareKalimaText = shareKalimaText;
 
 function shareAllKalimas() {
-  const text = `شش کلمے (Six Kalimas with Urdu & English Translations)\nRead & listen in Noor Al-Islam App!`;
+  const text = `شش کلمے (Six Kalimas with Urdu & English Translations)\nRead in Noor Al Islam: Quran & Azan — Your Daily Companion in Islam`;
   if (navigator.share) {
     navigator.share({ title: 'Six Kalimas', text: text }).catch(() => {});
   } else {
@@ -6010,7 +6010,7 @@ function copyDuaText(id) {
   if (typeof DAILY_DUAS_DATA === 'undefined') return;
   const d = DAILY_DUAS_DATA.find(item => item.id === id);
   if (!d) return;
-  const text = `${d.titleUrdu} (${d.titleEnglish})\n\n${d.arabic}\n\nاردو: ${d.urdu}\n\nحوالہ: ${d.ref || ''}\n\n- Noor Al-Islam App`;
+  const text = `${d.titleUrdu} (${d.titleEnglish})\n\n${d.arabic}\n\nاردو: ${d.urdu}\n\nحوالہ: ${d.ref || ''}\n\n— Noor Al Islam (Your Daily Companion in Islam)`;
   navigator.clipboard ? navigator.clipboard.writeText(text).then(() => showAppToast('Dua copied!')) : showAppToast('Copied');
 }
 window.copyDuaText = copyDuaText;
@@ -6446,7 +6446,7 @@ function copyNamazStepText(stepId) {
     s = NAMAZ_GUIDE_DATA.witr.qunootStep;
   }
   if (!s) return;
-  const text = `${s.titleUrdu} (${s.postureUrdu || ''})\n\n${s.arabic}\n\nاردو: ${s.urdu}\n\nEnglish: ${s.english}\n\n- Noor Al-Islam App`;
+  const text = `${s.titleUrdu} (${s.postureUrdu || ''})\n\n${s.arabic}\n\nاردو: ${s.urdu}\n\nEnglish: ${s.english}\n\n— Noor Al Islam (Your Daily Companion in Islam)`;
   navigator.clipboard ? navigator.clipboard.writeText(text).then(() => showAppToast('Namaz text copied!')) : showAppToast('Copied');
 }
 window.copyNamazStepText = copyNamazStepText;
@@ -6468,7 +6468,7 @@ function shareNamazStepText(stepId) {
 window.shareNamazStepText = shareNamazStepText;
 
 function shareNamazGuide() {
-  const text = `نماز کا مکمل و مسنون طریقہ مع قرآنی تلاوت و رکعات چارٹ (Noor Al-Islam App)\n\nنماز دین کا ستون ہے۔ نورِ اسلام ایپ سے نماز کا صحیح طریقہ سیکھیں اور شیئر کر کے صدقۂ جاریہ کمائیں۔\n\nDownload Noor Al-Islam App`;
+  const text = `نماز کا مکمل و مسنون طریقہ مع قرآنی تلاوت و رکعات چارٹ\nNoor Al Islam: Quran & Azan — Your Daily Companion in Islam\n\nنماز دین کا ستون ہے۔ نورِ اسلام ایپ سے نماز کا صحیح طریقہ سیکھیں اور شیئر کر کے صدقۂ جاریہ کمائیں۔\nDesigned by BAS Software Bilal Shah`;
   if (navigator.share) {
     navigator.share({ title: 'طریقۂ نماز مکمل', text: text }).catch(() => {});
   } else {
@@ -7134,7 +7134,7 @@ function renderIslamicCard() {
 
   ctx.fillStyle = '#38bdf8';
   ctx.font = 'bold 26px sans-serif';
-  ctx.fillText("Download App: Noor Al-Islam (مستند اسلامی ایپ)", w / 2, h - 120);
+  ctx.fillText("Noor Al Islam: Quran & Azan • Designed by BAS Software Bilal Shah", w / 2, h - 120);
 }
 
 function downloadIslamicCard() {
@@ -7167,7 +7167,7 @@ async function shareIslamicCard() {
   if (!canvas) return;
 
   const dataUrl = canvas.toDataURL('image/png');
-  const caption = `${currentCardData.arabic || ''}\n\n${currentCardData.urdu || ''}\n${currentCardData.ref || ''}\n\nنورِ اسلام ایپ (Noor Al-Islam)`;
+  const caption = `${currentCardData.arabic || ''}\n\n${currentCardData.urdu || ''}\n${currentCardData.ref || ''}\n\nنورِ اسلام ایپ (Noor Al Islam: Quran & Azan)\nYour Daily Companion in Islam\nDesigned by BAS Software Bilal Shah`;
 
   // Priority 1: Native Android FileProvider WhatsApp / Share Sheet
   if (window.AndroidApp && typeof window.AndroidApp.shareImageToWhatsApp === 'function') {

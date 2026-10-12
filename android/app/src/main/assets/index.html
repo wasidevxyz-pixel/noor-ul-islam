@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
-  <title>نور الإسلام — Noor Al-Islam</title>
-  <meta name="description" content="Authentic Pakistani Indo-Pak Quran Majeed, Exact Namaz Timings, Gyroscope Qibla Compass, Hadith, Tasbih & Mosque Finder.">
+  <title>Noor Al Islam: Quran &amp; Azan</title>
+  <meta name="application-name" content="Noor Al Islam">
+  <meta name="description" content="Noor Al Islam: Quran &amp; Azan — Your Daily Companion in Islam. Authentic Indo-Pak Quran Majeed, Exact Namaz Timings, Gyroscope Qibla Compass, Hadith, Tasbih &amp; Mosque Finder. Designed by BAS Software Bilal Shah.">
+  <meta name="author" content="BAS Software Bilal Shah">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Amiri:ital,wght@0,400;0,700;1,400&family=Scheherazade+New:wght@400;600;700&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -35,9 +37,10 @@
   <div class="side-drawer-overlay" id="side-drawer-overlay" onclick="closeSideDrawer()">
     <div class="side-drawer-panel" onclick="event.stopPropagation()">
       <div class="drawer-header">
-        <img src="assets/icon.png" alt="Noor Al-Islam Logo" style="width: 58px; height: 58px; border-radius: 16px; border: 2px solid var(--gold-primary); margin-bottom: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.4);">
-        <div class="drawer-brand-title">Noor Al-Islam</div>
-        <div class="drawer-brand-sub">نور الإسلام • Authentic Islamic App</div>
+        <img src="assets/icon.png" alt="Noor Al Islam Logo" style="width: 58px; height: 58px; border-radius: 16px; border: 2px solid var(--gold-primary); margin-bottom: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.4);">
+        <div class="drawer-brand-title">Noor Al Islam</div>
+        <div class="drawer-brand-sub">Your Daily Companion in Islam</div>
+        <div style="font-family: var(--font-urdu); font-size: 0.88rem; color: #fef08a; margin-top: 2px;">نور الإسلام • اسلامی رہبر و رفیق</div>
       </div>
       <div class="drawer-nav-list">
         <div class="drawer-nav-item" onclick="navigateTo('home'); closeSideDrawer();">
@@ -111,6 +114,11 @@
         </div>
         <div class="drawer-nav-item" onclick="openVerifiedSourcesModal(); closeSideDrawer();">
           <span>📜</span> <span>100% Verified Sources (مستند مراجع)</span>
+        </div>
+        <div class="drawer-footer-card" style="padding: 1rem 0.85rem; border-top: 1px solid rgba(255,255,255,0.12); margin-top: 1.25rem; text-align: center; background: rgba(0,0,0,0.2); border-radius: 14px;">
+          <div style="font-size: 0.82rem; font-weight: 800; color: #fef08a;">Noor Al Islam: Quran &amp; Azan</div>
+          <div style="font-size: 0.72rem; color: rgba(255,255,255,0.8); margin-top: 2px;">Your Daily Companion in Islam • v1.0.7</div>
+          <div style="font-size: 0.76rem; font-weight: 700; color: #34d399; margin-top: 6px;">Designed by BAS Software • Bilal Shah</div>
         </div>
       </div>
     </div>
@@ -701,6 +709,25 @@
             <div class="settings-row" onclick="testInspirationNotification('hadith')">
               <span class="settings-row-label">📜 Test Daily Hadith Notification Sound</span>
               <span class="settings-row-val">Send Alert &gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- About & Developer Credit -->
+        <div>
+          <div class="settings-group-title">About &amp; Developer</div>
+          <div class="settings-card" style="overflow: hidden;">
+            <div style="padding: 1rem; display: flex; align-items: center; gap: 0.85rem;">
+              <img src="assets/icon.png" alt="Noor Al Islam" style="width: 52px; height: 52px; border-radius: 14px; border: 1.5px solid var(--gold-primary); box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+              <div>
+                <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary);">Noor Al Islam: Quran &amp; Azan</div>
+                <div style="font-size: 0.8rem; color: var(--emerald-primary); font-weight: 700; margin-top: 1px;">Your Daily Companion in Islam</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Version 1.0.7 • 100% Free &amp; Ad-Free Authentic App</div>
+              </div>
+            </div>
+            <div style="padding: 0.75rem 1rem; background: rgba(16,185,129,0.06); border-top: 1px dashed var(--card-border); display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);">Designed by</span>
+              <span style="font-size: 0.82rem; font-weight: 800; color: var(--emerald-primary);">BAS Software • Bilal Shah</span>
             </div>
           </div>
         </div>
@@ -1510,6 +1537,13 @@
             <span class="more-tool-icon">🎯</span>
             <span class="more-tool-title">Building Pinpoint</span>
             <span class="more-tool-desc">100% exact address deduction</span>
+          </div>
+
+          <div style="grid-column: 1 / -1; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.15rem; text-align: center; box-shadow: var(--card-shadow); margin-top: 0.5rem;">
+            <div style="font-size: 1.1rem; font-weight: 800; color: var(--emerald-primary);">Noor Al Islam: Quran &amp; Azan</div>
+            <div style="font-size: 0.82rem; color: var(--gold-primary); font-weight: 700; margin-top: 2px;">Your Daily Companion in Islam</div>
+            <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 6px;">This app is designed by <strong style="color:var(--text-primary);">BAS Software (Bilal Shah)</strong></div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px;">Version 1.0.7 • May Allah reward everyone who shares this noble work.</div>
           </div>
         </div>
       </div>
