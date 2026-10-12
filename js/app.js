@@ -6477,6 +6477,36 @@ function shareNamazGuide() {
 }
 window.shareNamazGuide = shareNamazGuide;
 
+function shareUmrahGuide() {
+  const text = `عمرہ کا مکمل مسنون طریقہ مع دعائیں (Umrah Guide)\nفقہ حنفی اور سنتِ نبوی ﷺ کے مطابق عمرہ کے فرائض، طواف، سعی اور حلق کے احکام نور الاسلام ایپ پر ملاحظہ فرمائیں!`;
+  if (navigator.share) {
+    navigator.share({ title: 'عمرہ کا طریقہ', text: text }).catch(() => {});
+  } else {
+    navigator.clipboard ? navigator.clipboard.writeText(text).then(() => showAppToast('Umrah guide link copied!')) : showAppToast('Copied');
+  }
+}
+window.shareUmrahGuide = shareUmrahGuide;
+
+function shareHajjGuide() {
+  const text = `حج کا مکمل مسنون طریقہ مع شیڈول (Hajj Guide)\nفقہ حنفی کے مطابق ۸ تا ۱۲ ذوالحجہ کا مکمل طریقہ نور الاسلام ایپ پر ملاحظہ فرمائیں!`;
+  if (navigator.share) {
+    navigator.share({ title: 'حج کا مکمل طریقہ', text: text }).catch(() => {});
+  } else {
+    navigator.clipboard ? navigator.clipboard.writeText(text).then(() => showAppToast('Hajj guide link copied!')) : showAppToast('Copied');
+  }
+}
+window.shareHajjGuide = shareHajjGuide;
+
+function shareVerifiedSources() {
+  const text = `نور الاسلام ایپ کے ۱۰۰٪ مستند و مصدقہ مآخذ (100% Verified Islamic Content & Sources)\nقرآن، احادیث (صحاح ستہ)، فقہی مسائل اور مستند ادعیہ کی مکمل اسناد!`;
+  if (navigator.share) {
+    navigator.share({ title: 'Verified Sources', text: text }).catch(() => {});
+  } else {
+    navigator.clipboard ? navigator.clipboard.writeText(text).then(() => showAppToast('Verified sources link copied!')) : showAppToast('Copied');
+  }
+}
+window.shareVerifiedSources = shareVerifiedSources;
+
 // ==========================================================================
 // 16. GOOGLE MAPS NAVIGATION HELPERS
 // ==========================================================================
