@@ -7597,22 +7597,27 @@ function renderHalalListUI() {
   // Add live Google Maps-styled markers on map
   if (halalLeafletMapObj && typeof L !== 'undefined') {
     filtered.forEach((p, index) => {
-      const distFormatted = formatDistanceLabel(Math.round(p.distanceMeters || 300));
-      const safeName = (p.name || '').replace(/'/g, "\\'");
-      const popupHtml = `
-        <div style="font-family:inherit; min-width:180px; line-height:1.4;">
-          <div style="font-weight:800; font-size:0.95rem; color:#0f172a;">🍽️ ${p.name}</div>
-          <div style="font-size:0.75rem; color:#059669; font-weight:700; margin-top:2px;">${p.cuisine}</div>
-          <div style="font-size:0.75rem; color:#64748b; margin-top:3px;">📍 ${distFormatted} • ${p.address}</div>
-          <button style="margin-top:8px; width:100%; padding:6px 10px; font-size:0.78rem; font-weight:700; background:#059669; color:#fff; border:none; border-radius:8px; cursor:pointer;" onclick="openHalalDirections(${p.lat}, ${p.lng}, '${safeName}', '${safeAddr}')">
-            🧭 Google Maps Directions
-          </button>
-        </div>
-      `;
-      const marker = L.marker([p.lat, p.lng], { icon: getRestaurantPinIcon(p.type) })
-        .addTo(halalLeafletMapObj)
-        .bindPopup(popupHtml);
-      halalMapMarkers.push(marker);
+      try {
+        const distFormatted = formatDistanceLabel(Math.round(p.distanceMeters || 300));
+        const safeName = (p.name || '').replace(/'/g, "\\'");
+        const safeAddr = (p.address || '').replace(/'/g, "\\'");
+        const popupHtml = `
+          <div style="font-family:inherit; min-width:180px; line-height:1.4;">
+            <div style="font-weight:800; font-size:0.95rem; color:#0f172a;">🍽️ ${p.name}</div>
+            <div style="font-size:0.75rem; color:#059669; font-weight:700; margin-top:2px;">${p.cuisine}</div>
+            <div style="font-size:0.75rem; color:#64748b; margin-top:3px;">📍 ${distFormatted} • ${p.address}</div>
+            <button style="margin-top:8px; width:100%; padding:6px 10px; font-size:0.78rem; font-weight:700; background:#059669; color:#fff; border:none; border-radius:8px; cursor:pointer;" onclick="openHalalDirections(${p.lat}, ${p.lng}, '${safeName}', '${safeAddr}')">
+              🧭 Google Maps Directions
+            </button>
+          </div>
+        `;
+        const marker = L.marker([p.lat, p.lng], { icon: getRestaurantPinIcon(p.type) })
+          .addTo(halalLeafletMapObj)
+          .bindPopup(popupHtml);
+        halalMapMarkers.push(marker);
+      } catch (err) {
+        console.warn("Marker creation error:", err);
+      }
     });
   }
 

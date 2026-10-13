@@ -345,8 +345,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun notifyWebviewHalal(jsonArrayStr: String) {
-        val escaped = jsonArrayStr.replace("\\", "\\\\").replace("'", "\\'")
-        val js = "if(window.onNativeHalalReceived){ window.onNativeHalalReceived(JSON.parse('$escaped')); }"
+        val safeJson = if (jsonArrayStr.isBlank()) "[]" else jsonArrayStr.replace("\r", " ").replace("\n", " ")
+        val escaped = safeJson.replace("\\", "\\\\").replace("'", "\\'")
+        val js = "if(window.onNativeHalalReceived){ try { window.onNativeHalalReceived(JSON.parse('$escaped')); } catch(e){ window.onNativeHalalReceived($safeJson); } }"
         webView.post { webView.evaluateJavascript(js, null) }
     }
 
