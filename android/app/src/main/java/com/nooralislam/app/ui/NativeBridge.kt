@@ -7,6 +7,7 @@ import com.nooralislam.app.NoorApp
 import com.nooralislam.app.service.AzanAudioPlayer
 import com.nooralislam.app.service.AppAudioPlayer
 import com.nooralislam.app.service.PrayerCalculationService
+import com.nooralislam.app.data.remote.ApiClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -155,6 +156,139 @@ class NativeBridge(
                 activity.runOnUiThread {
                     activity.notifyWebviewMosques("[]")
                 }
+            }
+        }
+    }
+
+    @JavascriptInterface
+    fun fetchNearbyHalal(lat: Double, lng: Double, radiusMeters: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val jsonArray = JSONArray()
+            val seenKeys = mutableSetOf<String>()
+            try {
+                val delta = 0.05
+                val minLng = lng - delta
+                val maxLng = lng + delta
+                val minLat = lat - delta
+                val maxLat = lat + delta
+                val url = String.format(
+                    Locale.US,
+                    "https://nominatim.openstreetmap.org/search?format=json&q=restaurant&viewbox=%.5f,%.5f,%.5f,%.5f&bounded=1&limit=50",
+                    minLng, maxLat, maxLng, minLat
+                )
+                val req = okhttp3.Request.Builder().url(url).build()
+                val resp = ApiClient.okHttpClient.newCall(req).execute()
+                if (resp.isSuccessful) {
+                    val bodyStr = resp.body?.string() ?: "[]"
+                    val items = JSONArray(bodyStr)
+                    for (i in 0 until items.length()) {
+                        val itm = items.getJSONObject(i)
+                        val pLat = itm.optDouble("lat", 0.0)
+                        val pLng = itm.optDouble("lon", 0.0)
+                        if (pLat == 0.0 || pLng == 0.0) continue
+                        val key = String.format(Locale.US, "%.4f_%.4f", pLat, pLng)
+                        if (seenKeys.contains(key)) continue
+                        seenKeys.add(key)
+
+                        val fullName = itm.optString("display_name", "")
+                        val parts = fullName.split(",")
+                        val rawName = if (parts.isNotEmpty()) parts[0].trim() else "Restaurant"
+                        val lower = rawName.lowercase()
+                        if (lower.contains("colony") || lower.contains("sector") || lower.contains("police station") || lower.contains("mosque") || lower.contains("masjid")) {
+                            continue
+                        }
+
+                        val distResults = FloatArray(1)
+                        android.location.Location.distanceBetween(lat, lng, pLat, pLng, distResults)
+                        val distMeters = distResults[0].toDouble()
+
+                        val addr = if (parts.size > 3) parts.subList(1, 4).joinToString(", ") { it.trim() } else "Near your GPS location"
+
+                        var type = "restaurant"
+                        val cLower = (rawName + " " + itm.optString("type", "") + " " + addr).lowercase()
+                        if (cLower.contains("bbq") || cLower.contains("grill") || cLower.contains("kebab") || cLower.contains("tikka") || cLower.contains("habibi") || cLower.contains("basti")) {
+                            type = "bbq"
+                        } else if (cLower.contains("burger") || cLower.contains("pizza") || cLower.contains("fast food") || cLower.contains("shawarma") || cLower.contains("kfc") || cLower.contains("mcdonald")) {
+                            type = "fast_food"
+                        } else if (cLower.contains("cafe") || cLower.contains("bakery") || cLower.contains("coffee") || cLower.contains("tea") || cLower.contains("dessert")) {
+                            type = "cafe"
+                        }
+
+                        val cuisine = when (type) {
+                            "fast_food" -> "Fast Food & Burgers"
+                            "bbq" -> "BBQ & Traditional Grills"
+                            "cafe" -> "Cafe, Bakery & Sweets"
+                            else -> "Traditional Cuisine"
+                        }
+
+                        val obj = JSONObject().apply {
+                            put("name", rawName)
+                            put("type", type)
+                            put("cuisine", cuisine)
+                            put("address", addr)
+                            put("lat", pLat)
+                            put("lng", pLng)
+                            put("distanceMeters", distMeters)
+                        }
+                        jsonArray.put(obj)
+                    }
+                }
+            } catch (e: Exception) {
+                // Ignore and try fallback
+            }
+
+            if (jsonArray.length() == 0) {
+                try {
+                    val query = String.format(
+                        Locale.US,
+                        """
+                        [out:json][timeout:15];
+                        (
+                          node["amenity"~"restaurant|fast_food|cafe"](around:%d,%f,%f);
+                          way["amenity"~"restaurant|fast_food|cafe"](around:%d,%f,%f);
+                        );
+                        out center body 40;
+                        """.trimIndent(),
+                        radiusMeters, lat, lng,
+                        radiusMeters, lat, lng
+                    )
+                    val opResp = ApiClient.overpassApi.searchMosques(query)
+                    val elems = opResp.elements ?: emptyList()
+                    for (el in elems) {
+                        val eLat = el.lat ?: el.center?.lat ?: continue
+                        val eLon = el.lon ?: el.center?.lon ?: continue
+                        val key = String.format(Locale.US, "%.4f_%.4f", eLat, eLon)
+                        if (seenKeys.contains(key)) continue
+                        seenKeys.add(key)
+
+                        val tags = el.tags ?: emptyMap()
+                        val name = tags["name"] ?: tags["name:en"] ?: tags["name:ur"] ?: "Restaurant"
+                        val distResults = FloatArray(1)
+                        android.location.Location.distanceBetween(lat, lng, eLat, eLon, distResults)
+                        val distMeters = distResults[0].toDouble()
+
+                        val street = tags["addr:street"] ?: tags["addr:suburb"] ?: tags["addr:city"] ?: "Near your GPS location"
+                        val amenity = tags["amenity"] ?: "restaurant"
+                        val type = if (amenity == "fast_food") "fast_food" else if (amenity == "cafe") "cafe" else "restaurant"
+
+                        val obj = JSONObject().apply {
+                            put("name", name)
+                            put("type", type)
+                            put("cuisine", tags["cuisine"] ?: "Halal Dining")
+                            put("address", street)
+                            put("lat", eLat)
+                            put("lng", eLon)
+                            put("distanceMeters", distMeters)
+                        }
+                        jsonArray.put(obj)
+                    }
+                } catch (e: Exception) {
+                    // Ignore
+                }
+            }
+
+            activity.runOnUiThread {
+                activity.notifyWebviewHalal(jsonArray.toString())
             }
         }
     }

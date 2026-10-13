@@ -7434,6 +7434,17 @@ async function fetchNearbyHalalPlaces() {
 
   clearHalalMapMarkers();
 
+  // If running inside Android app, use rock-solid Native OkHttp Bridge (bypasses browser CORS & restrictions)
+  if (window.AndroidApp && typeof window.AndroidApp.fetchNearbyHalal === 'function') {
+    window.AndroidApp.fetchNearbyHalal(loc.lat, loc.lng, 5000);
+    setTimeout(() => {
+      if (document.getElementById('halal-list-container')?.innerHTML?.includes('Connecting to live map')) {
+        renderHalalListUI();
+      }
+    }, 4500);
+    return;
+  }
+
   const delta = 0.05; // ~5.5km radius bounding box
   const minLng = loc.lng - delta;
   const maxLng = loc.lng + delta;
@@ -7548,6 +7559,19 @@ async function fetchNearbyHalalPlaces() {
   renderHalalListUI();
 }
 window.fetchNearbyHalalPlaces = fetchNearbyHalalPlaces;
+
+function onNativeHalalReceived(places) {
+  if (Array.isArray(places) && places.length > 0) {
+    currentHalalPlaces = places;
+    const loc = state.userCustomLocation;
+    if (loc && loc.lat && loc.lng) {
+      const cacheKey = `halal_places_${loc.lat.toFixed(3)}_${loc.lng.toFixed(3)}`;
+      try { localStorage.setItem(cacheKey, JSON.stringify(places)); } catch (e) {}
+    }
+  }
+  renderHalalListUI();
+}
+window.onNativeHalalReceived = onNativeHalalReceived;
 
 function renderHalalListUI() {
   const container = document.getElementById('halal-list-container');

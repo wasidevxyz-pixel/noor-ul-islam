@@ -344,6 +344,12 @@ class MainActivity : AppCompatActivity() {
         webView.post { webView.evaluateJavascript(js, null) }
     }
 
+    fun notifyWebviewHalal(jsonArrayStr: String) {
+        val escaped = jsonArrayStr.replace("\\", "\\\\").replace("'", "\\'")
+        val js = "if(window.onNativeHalalReceived){ window.onNativeHalalReceived(JSON.parse('$escaped')); }"
+        webView.post { webView.evaluateJavascript(js, null) }
+    }
+
     override fun onBackPressed() {
         webView.evaluateJavascript("window.handleAndroidBackButton ? window.handleAndroidBackButton() : false;") { value ->
             val handledByJs = "true".equals(value, ignoreCase = true)

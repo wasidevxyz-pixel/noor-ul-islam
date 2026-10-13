@@ -22,7 +22,7 @@ object ApiClient {
         }
     }
 
-    private val okHttpClient: OkHttpClient by lazy {
+    val okHttpClient: OkHttpClient by lazy {
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BASIC
         }
