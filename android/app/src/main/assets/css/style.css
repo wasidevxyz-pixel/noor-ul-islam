@@ -3312,7 +3312,8 @@ body.dark-theme .btn-preview-audio {
   position: relative;
 }
 
-#mosque-map-container {
+#mosque-map-container,
+#halal-map-container {
   width: 100%;
   height: 100%;
 }
@@ -7920,29 +7921,28 @@ body.dark-theme .halal-filter-pill.active {
 }
 
 .halal-card-title {
-  font-size: 0.96rem;
+  font-size: 0.98rem;
   font-weight: 800;
   color: var(--text-primary);
   line-height: 1.35;
 }
 
-.halal-card-chinese {
-  font-size: 0.9rem;
+.halal-card-cuisine {
+  font-size: 0.82rem;
   font-weight: 700;
-  color: #047857;
-  margin-top: 3px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  color: var(--emerald-primary);
+  margin-top: 2px;
 }
 
-body.dark-theme .halal-card-chinese {
-  color: #34d399;
+body.dark-theme .halal-card-cuisine {
+  color: var(--emerald-accent);
 }
 
 .halal-card-urdu {
   font-family: var(--font-urdu);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   color: var(--text-secondary);
-  line-height: 1.7;
+  line-height: 1.6;
   direction: rtl;
   margin-top: 2px;
 }
@@ -8011,8 +8011,8 @@ body.dark-theme .halal-card-tag {
 
 .halal-card-actions {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.2rem;
+  gap: 0.45rem;
+  margin-top: 0.3rem;
   flex-wrap: wrap;
 }
 
@@ -8032,12 +8032,14 @@ body.dark-theme .halal-card-tag {
   justify-content: center;
   gap: 0.4rem;
   box-shadow: 0 3px 8px rgba(4, 120, 87, 0.22);
+  transition: transform 0.15s ease;
 }
 
 .btn-halal-dir:active {
   transform: scale(0.97);
 }
 
+.btn-halal-viewmap,
 .btn-halal-copy {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -8053,100 +8055,10 @@ body.dark-theme .halal-card-tag {
   transition: all 0.2s ease;
 }
 
+.btn-halal-viewmap:active,
 .btn-halal-copy:active {
   background: rgba(16, 185, 129, 0.1);
   transform: scale(0.97);
-}
-
-/* China Halal Survival Guide Cards */
-.china-guide-banner {
-  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #b91c1c 100%);
-  color: #fff;
-  border-radius: var(--radius-md);
-  padding: 1rem;
-  box-shadow: 0 6px 18px rgba(185, 28, 28, 0.25);
-  text-align: center;
-}
-
-.china-guide-title-zh {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #fef08a;
-  margin-bottom: 2px;
-}
-
-.china-guide-subtitle-ur {
-  font-family: var(--font-urdu);
-  font-size: 1.15rem;
-  line-height: 1.8;
-  margin-top: 4px;
-}
-
-.china-phrase-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-md);
-  padding: 0.95rem;
-  box-shadow: var(--card-shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-}
-
-.china-phrase-zh {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #dc2626;
-  letter-spacing: 0.5px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-}
-
-body.dark-theme .china-phrase-zh {
-  color: #f87171;
-}
-
-.china-phrase-pinyin {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--gold-primary);
-  letter-spacing: 0.2px;
-}
-
-.china-phrase-en {
-  font-size: 0.84rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.china-phrase-ur {
-  font-family: var(--font-urdu);
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  direction: rtl;
-  line-height: 1.7;
-}
-
-.china-phrase-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.2rem;
-}
-
-.btn-phrase-copy {
-  background: rgba(220, 38, 38, 0.1);
-  border: 1px solid rgba(220, 38, 38, 0.3);
-  color: #dc2626;
-  padding: 0.35rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-body.dark-theme .btn-phrase-copy {
-  color: #f87171;
-  background: rgba(248, 113, 113, 0.15);
-  border-color: rgba(248, 113, 113, 0.35);
 }
 
 /* ==========================================================================

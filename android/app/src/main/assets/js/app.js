@@ -3875,6 +3875,15 @@ async function handleResolvedCoordinates(lat, lng, accuracy, preResolvedName = "
   // AUTO-LOCATE & REFRESH MOSQUES AROUND GPS COORDINATES
   fetchNearbyMosques();
 
+  // AUTO-REFRESH HALAL RESTAURANTS AROUND GPS COORDINATES
+  if (typeof updateHalalGpsDisplay === 'function') {
+    updateHalalGpsDisplay();
+  }
+  const halalScreen = document.getElementById('view-halal-restaurants');
+  if (halalScreen && halalScreen.classList.contains('active')) {
+    if (typeof initHalalLeafletMap === 'function') initHalalLeafletMap();
+  }
+
   // Update Native Android ViewModel and Home Widgets!
   if (window.AndroidApp && typeof window.AndroidApp.setManualLocation === 'function') {
     window.AndroidApp.setManualLocation(lat, lng, resolvedName);
@@ -7223,150 +7232,65 @@ async function shareIslamicCard() {
 window.shareIslamicCard = shareIslamicCard;
 
 // ==========================================================================
-// 19. NEARBY HALAL RESTAURANTS & CHINA TRAVEL SURVIVAL GUIDE
+// 19. NEARBY HALAL RESTAURANTS & LIVE GPS RADAR (NO FIXED DATA)
 // ==========================================================================
 let currentHalalTab = 'all';
 let halalSearchQuery = '';
 let currentHalalPlaces = [];
+let halalLeafletMapObj = null;
+let halalMapMarkers = [];
+let halalUserMarker = null;
 
-const CURATED_HALAL_CHAINS = [
-  {
-    name: "Lanzhou Traditional Beef Lamian (Halal)",
-    chineseName: "兰州正宗牛肉拉面 (清真)",
-    urduName: "لاندژو روایتی بیف لامیان (مصدقہ حلال)",
-    type: "lamian",
-    cuisine: "Lanzhou Hui Muslim Pulled Noodles",
-    address: "Every major street & commercial area in China",
-    chineseAddress: "各商业街及主干道清真专营店",
-    halalCert: "100% Halal Hui Muslim Certified (中国清真认证)",
-    tags: ["兰州拉面", "Halal Beef", "Hand-pulled Noodles", "Hui Cuisine"],
-    lat: 39.9042,
-    lng: 116.4074
-  },
-  {
-    name: "Xinjiang Uyghur Roast Lamb & Kebabs (Halal)",
-    chineseName: "新疆风味清真烤肉餐厅",
-    urduName: "سنکیانگ ایغور روسٹڈ دنبہ و سیخ کباب (حلال)",
-    type: "xinjiang",
-    cuisine: "Uyghur Halal Roast Lamb, Polo, Naan",
-    address: "Xinjiang Muslim Food Center, Major City Centers",
-    chineseAddress: "各市新疆清真美食一条街 / 民族风味餐厅",
-    halalCert: "100% Halal Xinjiang Muslim (新疆穆斯林清真认证)",
-    tags: ["新疆烤肉", "Halal Lamb", "Naan & Pilaf", "Uyghur Food"],
-    lat: 39.9142,
-    lng: 116.4174
-  },
-  {
-    name: "Dong Lai Shun Halal Mutton Hotpot",
-    chineseName: "东来顺清真涮羊肉 (百年老字号)",
-    urduName: "دونگ لائی شون حلال مٹن ہاٹ پاٹ",
-    type: "dine",
-    cuisine: "Traditional Beijing Halal Hotpot & Roast Duck",
-    address: "Wangfujing / Main Commercial Districts",
-    chineseAddress: "王府井步行街及各大商圈清真老字号分店",
-    halalCert: "Centennial Halal Heritage (国家级清真老字号认证)",
-    tags: ["清真涮羊肉", "Halal Hotpot", "Dine-in", "Century-old Brand"],
-    lat: 39.9165,
-    lng: 116.4132
-  },
-  {
-    name: "Western Regions Muslim Kitchen",
-    chineseName: "西域清真美食坊",
-    urduName: "مغربی خطہ مسلم حلال کچن",
-    type: "xinjiang",
-    cuisine: "Halal Dapanji (Big Plate Chicken), Laghman",
-    address: "Near Central Mosque / Metro Hub",
-    chineseAddress: "清真寺周边及地铁商圈美食街",
-    halalCert: "100% Halal Certified (清真食品协会监制)",
-    tags: ["大盘鸡", "Halal Chicken", "Laghman Noodles", "Xinjiang"],
-    lat: 39.8942,
-    lng: 116.3974
-  },
-  {
-    name: "Al-Barakah Authentic Halal Restaurant",
-    chineseName: "巴拉卡清真阿拉伯餐厅",
-    urduName: "البرکہ مستند حلال عربی ریسٹورنٹ",
-    type: "dine",
-    cuisine: "Middle Eastern, Mandi, Grilled Shawarma & Rice",
-    address: "Embassy District / International Trade Center",
-    chineseAddress: "使馆区及国际商贸中心清真专区",
-    halalCert: "100% Halal Meat & Ingredients (清真认证)",
-    tags: ["Arab Cuisine", "Mandi Rice", "Grilled Shawarma", "Dine-in"],
-    lat: 39.9242,
-    lng: 116.4474
-  },
-  {
-    name: "Niujie Muslim Snack & Dumpling House",
-    chineseName: "牛街清真清汤牛肉水饺",
-    urduName: "حلال بیف ڈمپلنگز و سوپ",
-    type: "dine",
-    cuisine: "Traditional Halal Beef Dumplings & Baozi",
-    address: "Niujie Muslim Quarter & City Branches",
-    chineseAddress: "牛街穆斯林聚居区及各大清真小吃街",
-    halalCert: "Niujie Islamic Heritage (牛街清真协会认证)",
-    tags: ["清真水饺", "Beef Dumplings", "Halal Snacks", "Niujie"],
-    lat: 39.8842,
-    lng: 116.3674
+function clearHalalMapMarkers() {
+  if (halalLeafletMapObj && halalMapMarkers.length > 0) {
+    halalMapMarkers.forEach(m => {
+      try { halalLeafletMapObj.removeLayer(m); } catch (e) {}
+    });
   }
-];
-
-const CHINA_SURVIVAL_PHRASES = [
-  {
-    zh: "这是清真吗？",
-    pinyin: "Zhè shì qīngzhēn ma?",
-    en: "Is this food Halal?",
-    ur: "کیا یہ کھانا حلال ہے؟",
-    tip: "Show this to any restaurant or vendor. In China, '清真 (Qingzhen)' is the official legal term for Halal."
-  },
-  {
-    zh: "我不吃猪肉、不吃猪油。",
-    pinyin: "Wǒ bù chī zhūròu, bù chī zhūyóu.",
-    en: "I do not eat pork or lard (pork fat).",
-    ur: "میں سور کا گوشت اور چربی (lard) بالکل نہیں کھاتا۔",
-    tip: "Very important: many Chinese dishes use lard for frying. This card tells the chef clearly."
-  },
-  {
-    zh: "请带我去最近的清真餐馆或兰州拉面馆。",
-    pinyin: "Qǐng dài wǒ qù zuìjìn de qīngzhēn cānguǎn huò Lánzhōu lāmiàn guǎn.",
-    en: "Taxi: Please drive me to the nearest Halal restaurant or Lanzhou Lamian shop.",
-    ur: "ٹیکسی ڈرائیور: برائے مہربانی مجھے قریب ترین حلال ریسٹورنٹ یا لاندژو لامیان لے جائیں۔",
-    tip: "Show this directly to taxi drivers or enter in Didi."
-  },
-  {
-    zh: "这个菜含有料酒或任何酒精吗？",
-    pinyin: "Zhège cài hányǒu liàojiǔ huò rènhé jiǔjīng ma?",
-    en: "Does this dish contain cooking wine or any alcohol?",
-    ur: "کیا اس کھانے میں کوکنگ وائن یا الکوحل شامل ہے؟",
-    tip: "Common Chinese stir-fries might use 'Liaojiu' (cooking wine); halal restaurants never use it."
-  },
-  {
-    zh: "我是穆斯林，只吃清真食品。",
-    pinyin: "Wǒ shì Mùsīlín, zhǐ chī qīngzhēn shípǐn.",
-    en: "I am a Muslim, I only eat Halal food.",
-    ur: "میں مسلمان ہوں اور صرف حلال کھانا کھاتا ہوں۔",
-    tip: "Polite and universally understood across all provinces in China."
-  },
-  {
-    zh: "请给我一碗牛肉炒面 / 兰州拉面。",
-    pinyin: "Qǐng gěi wǒ yì wǎn niúròu chǎomiàn / Lánzhōu lāmiàn.",
-    en: "Please give me a bowl of beef fried noodles / Lanzhou beef noodles.",
-    ur: "برائے مہربانی مجھے بیف فرائیڈ نوڈلز یا لاندژو لامیان دیں۔",
-    tip: "The safest, most popular, and universally delicious halal meal anywhere in China."
-  },
-  {
-    zh: "附近有清真寺吗？",
-    pinyin: "Fùjìn yǒu qīngzhēnsì ma?",
-    en: "Is there a Mosque (Masjid) nearby?",
-    ur: "کیا قریب میں کوئی مسجد (مسجدِ نبوی یا جامع مسجد) ہے؟",
-    tip: "In China, Mosques are called '清真寺 (Qingzhen Si)'."
-  }
-];
+  halalMapMarkers = [];
+}
 
 function initHalalRestaurantsScreen() {
   updateHalalGpsDisplay();
-  loadNearbyHalalPlaces();
+  initHalalLeafletMap();
 }
 window.initHalalRestaurantsScreen = initHalalRestaurantsScreen;
+
+function initHalalLeafletMap() {
+  const container = document.getElementById('halal-map-container');
+  if (!container) return;
+
+  const loc = state.userCustomLocation;
+  if (!loc || !loc.lat || !loc.lng || (loc.lat === 0 && loc.lng === 0)) {
+    refreshHalalGpsLocation();
+    return;
+  }
+
+  if (typeof L !== 'undefined') {
+    if (!halalLeafletMapObj) {
+      halalLeafletMapObj = L.map('halal-map-container').setView([loc.lat, loc.lng], 14);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+      }).addTo(halalLeafletMapObj);
+    } else {
+      halalLeafletMapObj.setView([loc.lat, loc.lng], 14);
+      setTimeout(() => {
+        try { halalLeafletMapObj.invalidateSize(); } catch (e) {}
+      }, 200);
+    }
+
+    if (halalUserMarker) {
+      try { halalLeafletMapObj.removeLayer(halalUserMarker); } catch (e) {}
+    }
+    const locationName = loc.name || loc.city || "Live GPS Location";
+    halalUserMarker = L.marker([loc.lat, loc.lng]).addTo(halalLeafletMapObj)
+      .bindPopup(`<b>📍 Your Location</b><br>${locationName}`).openPopup();
+  }
+
+  fetchNearbyHalalPlaces();
+}
+window.initHalalLeafletMap = initHalalLeafletMap;
 
 function updateHalalGpsDisplay() {
   const coordsEl = document.getElementById('halal-current-coords-text');
@@ -7376,15 +7300,15 @@ function updateHalalGpsDisplay() {
   if (loc && loc.lat && loc.lng && (loc.lat !== 0 || loc.lng !== 0)) {
     const latStr = Math.abs(loc.lat).toFixed(5) + (loc.lat >= 0 ? '° N' : '° S');
     const lngStr = Math.abs(loc.lng).toFixed(5) + (loc.lng >= 0 ? '° E' : '° W');
-    const area = loc.name || loc.city || "Exact Position";
+    const area = loc.name || loc.city || "Live GPS Position";
     if (coordsEl) coordsEl.innerHTML = `📍 <strong>${area}</strong> (${latStr}, ${lngStr})`;
     if (statusEl) statusEl.textContent = "100% Precision Satellite GPS Locked";
   } else {
-    if (coordsEl) coordsEl.textContent = "📍 Locating precision coordinates via Satellite GPS...";
+    if (coordsEl) coordsEl.textContent = "📍 Auto-detecting live coordinates via Satellite GPS...";
     if (statusEl) statusEl.textContent = "Acquiring Satellite GPS Fix...";
-    refreshHalalGpsLocation();
   }
 }
+window.updateHalalGpsDisplay = updateHalalGpsDisplay;
 
 function refreshHalalGpsLocation() {
   triggerHaptic('bead');
@@ -7407,18 +7331,18 @@ function refreshHalalGpsLocation() {
         const lng = pos.coords.longitude;
         const acc = pos.coords.accuracy || 10;
         if (typeof handleResolvedCoordinates === 'function') {
-          handleResolvedCoordinates(lat, lng, acc, state.userCustomLocation ? state.userCustomLocation.name : "Live GPS Location", false);
+          handleResolvedCoordinates(lat, lng, acc, state.userCustomLocation ? state.userCustomLocation.name : "Live GPS Location", true);
         } else {
           state.userCustomLocation = { lat, lng, name: "Live GPS Location" };
+          updateHalalGpsDisplay();
+          initHalalLeafletMap();
         }
-        updateHalalGpsDisplay();
-        loadNearbyHalalPlaces();
         showAppToast(`GPS locked with ±${Math.round(acc)}m accuracy!`);
       },
       (err) => {
         console.warn("GPS error:", err);
         updateHalalGpsDisplay();
-        loadNearbyHalalPlaces();
+        initHalalLeafletMap();
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
@@ -7426,14 +7350,228 @@ function refreshHalalGpsLocation() {
 }
 window.refreshHalalGpsLocation = refreshHalalGpsLocation;
 
+async function fetchNearbyHalalPlaces() {
+  const container = document.getElementById('halal-list-container');
+  if (!container) return;
+
+  const loc = state.userCustomLocation;
+  if (!loc || !loc.lat || !loc.lng || (loc.lat === 0 && loc.lng === 0)) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:1.5rem; color:var(--text-muted); background:var(--card-bg); border-radius:12px; border:1px solid var(--card-border);">
+        <div style="font-size:2rem; margin-bottom:0.4rem;">🛰️</div>
+        <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.25rem;">Waiting for GPS coordinates...</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.8rem;">Tap below to acquire live satellite location</div>
+        <button class="btn-arch-solid" style="padding:0.5rem 1rem; border-radius:10px; margin:0 auto; font-size:0.85rem;" onclick="refreshHalalGpsLocation()">
+          <span>🎯 Acquire GPS</span>
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div style="text-align:center; padding:1.5rem; color:var(--text-muted); background:var(--card-bg); border-radius:12px; border:1px solid var(--card-border);">
+      <div style="font-size:2rem; margin-bottom:0.4rem;">🛰️</div>
+      <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.25rem;">Scanning live Halal eateries near you...</div>
+      <div style="font-size:0.8rem; color:var(--text-secondary);">Querying 5km radius around your live GPS coordinates</div>
+    </div>
+  `;
+
+  clearHalalMapMarkers();
+
+  let fetchedList = [];
+  try {
+    const query = `[out:json][timeout:15];(
+      node["amenity"~"restaurant|fast_food|cafe"]["diet:halal"="yes"](around:5000,${loc.lat},${loc.lng});
+      way["amenity"~"restaurant|fast_food|cafe"]["diet:halal"="yes"](around:5000,${loc.lat},${loc.lng});
+      node["amenity"~"restaurant|fast_food|cafe"]["cuisine"~"halal|kebab|turkish|pakistani|indian|lebanese|arab|middle_eastern|persian|afghan|moroccan|syrian|bengali|indonesian|malaysian|uyghur|xinjiang|lanzhou|qingzhen",i](around:5000,${loc.lat},${loc.lng});
+      way["amenity"~"restaurant|fast_food|cafe"]["cuisine"~"halal|kebab|turkish|pakistani|indian|lebanese|arab|middle_eastern|persian|afghan|moroccan|syrian|bengali|indonesian|malaysian|uyghur|xinjiang|lanzhou|qingzhen",i](around:5000,${loc.lat},${loc.lng});
+      node["amenity"~"restaurant|fast_food|cafe"]["name"~"halal|حلال|حلالا|halâl|kebab|shawarma|qingzhen",i](around:5000,${loc.lat},${loc.lng});
+      way["amenity"~"restaurant|fast_food|cafe"]["name"~"halal|حلال|حلالا|halâl|kebab|shawarma|qingzhen",i](around:5000,${loc.lat},${loc.lng});
+    );out center 45;`;
+
+    const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+    if (res.ok) {
+      const data = await res.json();
+      const elements = data.elements || [];
+      const seen = new Set();
+
+      elements.forEach(el => {
+        const eLat = el.lat || el.center?.lat;
+        const eLon = el.lon || el.center?.lon;
+        if (!eLat || !eLon) return;
+
+        const key = `${eLat.toFixed(4)}_${eLon.toFixed(4)}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+
+        const tags = el.tags || {};
+        const rawName = tags.name || tags["name:en"] || tags["name:ur"] || tags.brand || "Halal Restaurant";
+        const dist = getHaversineDistanceMeters(loc.lat, loc.lng, eLat, eLon);
+        const cuisine = tags.cuisine || (tags["diet:halal"] === "yes" ? "Halal Certified" : "Muslim Halal Food");
+        const amenity = tags.amenity || "restaurant";
+
+        let type = 'restaurant';
+        const cLower = (cuisine + " " + rawName + " " + amenity).toLowerCase();
+        if (cLower.includes('bbq') || cLower.includes('grill') || cLower.includes('kebab') || cLower.includes('tikka') || cLower.includes('charcoal')) {
+          type = 'bbq';
+        } else if (amenity === 'fast_food' || cLower.includes('burger') || cLower.includes('pizza') || cLower.includes('shawarma') || cLower.includes('fast food')) {
+          type = 'fast_food';
+        } else if (amenity === 'cafe' || cLower.includes('cafe') || cLower.includes('bakery') || cLower.includes('tea') || cLower.includes('coffee') || cLower.includes('dessert')) {
+          type = 'cafe';
+        }
+
+        const street = tags["addr:street"] || tags["addr:suburb"] || tags["addr:city"] || tags["addr:district"] || "Near your GPS location";
+        const phone = tags.phone || tags["contact:phone"] || "";
+
+        fetchedList.push({
+          name: rawName,
+          type: type,
+          cuisine: cuisine.replace(/;/g, ', '),
+          address: street,
+          phone: phone,
+          lat: eLat,
+          lng: eLon,
+          distanceMeters: dist
+        });
+      });
+    }
+  } catch (e) {
+    console.warn("Overpass halal query notice:", e);
+  }
+
+  currentHalalPlaces = fetchedList;
+  renderHalalListUI();
+}
+window.fetchNearbyHalalPlaces = fetchNearbyHalalPlaces;
+
+function renderHalalListUI() {
+  const container = document.getElementById('halal-list-container');
+  if (!container) return;
+
+  clearHalalMapMarkers();
+
+  let filtered = currentHalalPlaces.filter(p => {
+    if (currentHalalTab !== 'all' && p.type !== currentHalalTab) return false;
+
+    if (halalSearchQuery) {
+      const q = halalSearchQuery;
+      const match = (p.name || '').toLowerCase().includes(q) ||
+                    (p.cuisine || '').toLowerCase().includes(q) ||
+                    (p.address || '').toLowerCase().includes(q);
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  filtered.sort((a, b) => (a.distanceMeters || 0) - (b.distanceMeters || 0));
+
+  // Add live Leaflet markers on map
+  if (halalLeafletMapObj && typeof L !== 'undefined') {
+    filtered.forEach((p, index) => {
+      const distFormatted = formatDistanceLabel(Math.round(p.distanceMeters || 300));
+      const safeName = (p.name || '').replace(/'/g, "\\'");
+      const popupHtml = `
+        <div style="font-family:inherit; min-width:160px; line-height:1.4;">
+          <div style="font-weight:800; font-size:0.9rem; color:#0f172a;">🍽️ ${p.name}</div>
+          <div style="font-size:0.75rem; color:#059669; font-weight:700; margin-top:2px;">${p.cuisine}</div>
+          <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">📍 ${distFormatted} • ${p.address}</div>
+          <button style="margin-top:6px; width:100%; padding:4px 8px; font-size:0.75rem; font-weight:700; background:#059669; color:#fff; border:none; border-radius:6px; cursor:pointer;" onclick="openHalalDirections(${p.lat}, ${p.lng}, '${safeName}')">
+            🧭 Walking Directions
+          </button>
+        </div>
+      `;
+      const marker = L.marker([p.lat, p.lng]).addTo(halalLeafletMapObj).bindPopup(popupHtml);
+      halalMapMarkers.push(marker);
+    });
+  }
+
+  if (filtered.length === 0) {
+    if (currentHalalPlaces.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:1.75rem 1rem; color:var(--text-muted); background:var(--card-bg); border-radius:14px; border:1px solid var(--card-border);">
+          <div style="font-size:2.2rem; margin-bottom:0.5rem;">🍽️</div>
+          <div style="font-weight:800; color:var(--text-primary); margin-bottom:0.3rem;">No direct map entries in immediate 5km</div>
+          <div style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:1rem;">Tap below to launch live Google Maps search for verified Halal restaurants at your exact location worldwide</div>
+          <button class="btn-arch-solid" style="padding:0.6rem 1.25rem; border-radius:10px; margin:0 auto; font-size:0.85rem;" onclick="openLiveGoogleMapsHalal()">
+            <span>🗺️ Search on Google Maps</span>
+          </button>
+        </div>
+      `;
+    } else {
+      container.innerHTML = `
+        <div style="text-align:center; padding:1.75rem 1rem; color:var(--text-muted); background:var(--card-bg); border-radius:14px; border:1px solid var(--card-border);">
+          <div style="font-size:2.2rem; margin-bottom:0.5rem;">🔍</div>
+          <div style="font-weight:800; color:var(--text-primary); margin-bottom:0.3rem;">No places matched your filter</div>
+          <div style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:1rem;">Try selecting "All Halal" or clearing your search text</div>
+          <button class="btn-arch-solid" style="padding:0.5rem 1.1rem; border-radius:10px; margin:0 auto; font-size:0.82rem;" onclick="filterHalalPlaces('all')">
+            <span>Show All Halal (${currentHalalPlaces.length})</span>
+          </button>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  container.innerHTML = filtered.map((p, index) => {
+    const distFormatted = formatDistanceLabel(Math.round(p.distanceMeters || 300));
+    const safeName = (p.name || '').replace(/'/g, "\\'");
+    const safeAddr = (p.address || '').replace(/'/g, "\\'");
+
+    return `
+      <div class="halal-card-item">
+        <div class="halal-card-header">
+          <div class="halal-card-title-group">
+            <div class="halal-card-title">🍽️ ${p.name}</div>
+            <div class="halal-card-cuisine">${p.cuisine}</div>
+          </div>
+          <div class="halal-badge-box">
+            <span class="halal-cert-badge">✅ 100% Halal</span>
+            <span class="halal-distance-badge">📍 ${distFormatted}</span>
+          </div>
+        </div>
+
+        <div class="halal-card-addr">
+          <strong>Address:</strong> ${p.address}${p.phone ? `<br><span>📞 Phone: ${p.phone}</span>` : ''}
+        </div>
+
+        <div class="halal-card-actions">
+          <button class="btn-halal-dir" onclick="openHalalDirections(${p.lat}, ${p.lng}, '${safeName}')">
+            <span>🧭 Directions</span>
+          </button>
+          <button class="btn-halal-viewmap" onclick="focusHalalMapMarker(${index})">
+            <span>🗺️ View on Map</span>
+          </button>
+          <button class="btn-halal-copy" onclick="copyHalalAddress('${safeName}', '${safeAddr}')">
+            <span>📋 Copy</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+window.renderHalalListUI = renderHalalListUI;
+
+function focusHalalMapMarker(index) {
+  triggerHaptic('bead');
+  if (halalMapMarkers && halalMapMarkers[index] && halalLeafletMapObj) {
+    const marker = halalMapMarkers[index];
+    const latLng = marker.getLatLng();
+    halalLeafletMapObj.setView(latLng, 16);
+    marker.openPopup();
+
+    const mapCard = document.querySelector('.radar-map-card');
+    if (mapCard) {
+      mapCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+}
+window.focusHalalMapMarker = focusHalalMapMarker;
+
 function openLiveGoogleMapsHalal() {
   triggerHaptic('milestone');
-  const loc = (state && state.userCustomLocation && state.userCustomLocation.lat) ? state.userCustomLocation : { lat: 39.9042, lng: 116.4074 };
-  
-  // Detect if location is in China (rough bounding box lat 18-54, lng 73-135)
-  const isChina = (loc.lat >= 18 && loc.lat <= 54 && loc.lng >= 73 && loc.lng <= 135);
-  const searchTerm = isChina ? encodeURIComponent("清真餐馆 halal restaurant") : encodeURIComponent("halal restaurant");
-  const url = `https://www.google.com/maps/search/${searchTerm}/@${loc.lat},${loc.lng},15z`;
+  const loc = (state && state.userCustomLocation && state.userCustomLocation.lat) ? state.userCustomLocation : { lat: 31.5204, lng: 74.3587 };
+  const url = `https://www.google.com/maps/search/halal+restaurant/@${loc.lat},${loc.lng},15z`;
 
   if (window.AndroidApp && typeof window.AndroidApp.openExternalUrl === 'function') {
     window.AndroidApp.openExternalUrl(url);
@@ -7459,46 +7597,18 @@ function openHalalDirections(destLat, destLng, destName) {
 }
 window.openHalalDirections = openHalalDirections;
 
-function copyHalalAddress(chineseName, chineseAddress) {
+function copyHalalAddress(name, address) {
   triggerHaptic('bead');
-  const text = `${chineseName}\n${chineseAddress}`;
+  const text = `${name}\n${address}`;
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text).then(() => {
-      showAppToast("Copied! Show this to your Taxi / Didi driver");
+      showAppToast(`Copied: "${name}"`);
     });
   } else {
     showAppToast("Copied to clipboard");
   }
 }
 window.copyHalalAddress = copyHalalAddress;
-
-function speakChinaPhrase(text) {
-  triggerHaptic('bead');
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-CN';
-    utterance.rate = 0.85; // Slightly slower for crisp clarity
-    window.speechSynthesis.speak(utterance);
-    showAppToast(`🔊 Speaking: "${text}"`);
-  } else {
-    copyChinaPhrase(text, "");
-  }
-}
-window.speakChinaPhrase = speakChinaPhrase;
-
-function copyChinaPhrase(zhText, urText) {
-  triggerHaptic('bead');
-  const text = zhText;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(() => {
-      showAppToast(`Copied Chinese: "${zhText}"`);
-    });
-  } else {
-    showAppToast("Copied");
-  }
-}
-window.copyChinaPhrase = copyChinaPhrase;
 
 function filterHalalPlaces(tab) {
   triggerHaptic('bead');
@@ -7507,226 +7617,16 @@ function filterHalalPlaces(tab) {
   const activeBtn = document.getElementById(`halal-tab-${tab}`);
   if (activeBtn) activeBtn.classList.add('active');
 
-  const container = document.getElementById('halal-list-container');
-  if (!container) return;
-
-  if (tab === 'china') {
-    renderChinaGuideUI(container);
-  } else {
-    renderHalalListUI(container);
-  }
+  renderHalalListUI();
 }
 window.filterHalalPlaces = filterHalalPlaces;
 
 function handleHalalSearch(query) {
   halalSearchQuery = (query || '').toLowerCase().trim();
-  const container = document.getElementById('halal-list-container');
-  if (container) {
-    if (currentHalalTab === 'china') {
-      renderChinaGuideUI(container);
-    } else {
-      renderHalalListUI(container);
-    }
-  }
+  renderHalalListUI();
 }
 window.handleHalalSearch = handleHalalSearch;
 
-async function loadNearbyHalalPlaces() {
-  const container = document.getElementById('halal-list-container');
-  if (!container) return;
-
-  const loc = state.userCustomLocation || { lat: 39.9042, lng: 116.4074 };
-  container.innerHTML = `
-    <div style="text-align:center; padding:1.5rem; color:var(--text-muted); background:var(--card-bg); border-radius:12px; border:1px solid var(--card-border);">
-      <div style="font-size:2rem; margin-bottom:0.4rem;">🛰️</div>
-      <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.25rem;">Querying nearby Halal eateries...</div>
-      <div style="font-size:0.8rem; color:var(--text-secondary);">Calculating precise distances from your live GPS coordinates</div>
-    </div>
-  `;
-
-  let fetchedOverpass = [];
-  try {
-    const query = `[out:json][timeout:12];(node["amenity"="restaurant"]["diet:halal"="yes"](around:5000,${loc.lat},${loc.lng});node["amenity"="restaurant"]["cuisine"~"halal|qingzhen|uyghur|xinjiang|lanzhou",i](around:5000,${loc.lat},${loc.lng});node["amenity"="restaurant"]["name"~"清真|兰州|拉面|新疆",i](around:5000,${loc.lat},${loc.lng}););out center 20;`;
-    const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
-    if (res.ok) {
-      const data = await res.json();
-      const elements = data.elements || [];
-      fetchedOverpass = elements.map(el => {
-        const eLat = el.lat || el.center?.lat;
-        const eLon = el.lon || el.center?.lon;
-        const tags = el.tags || {};
-        const name = tags.name || tags["name:en"] || "Qingzhen Halal Restaurant";
-        const dist = getHaversineDistanceMeters(loc.lat, loc.lng, eLat, eLon);
-        return {
-          name: name,
-          chineseName: tags["name:zh"] || tags.name || "清真风味餐厅",
-          urduName: "مصدقہ حلال ریستوران",
-          type: (tags.cuisine || "").toLowerCase().includes("lanzhou") ? "lamian" : "dine",
-          cuisine: tags.cuisine || "Authentic Halal Cuisine",
-          address: tags["addr:street"] || tags["addr:suburb"] || tags["addr:city"] || "Nearby your location",
-          chineseAddress: tags["addr:street:zh"] || "附近清真餐饮店",
-          halalCert: "100% Halal Verified (清真认证)",
-          tags: ["Halal Certified", "清真", tags.cuisine || "Muslim Food"],
-          lat: eLat,
-          lng: eLon,
-          distanceMeters: dist
-        };
-      });
-    }
-  } catch (e) {
-    console.warn("Halal Overpass notice:", e);
-  }
-
-  // Merge with curated local places and calculate precise distances
-  const merged = [...fetchedOverpass];
-  CURATED_HALAL_CHAINS.forEach(chain => {
-    // Offset slightly for demonstration near user's GPS if user is far
-    const dist = getHaversineDistanceMeters(loc.lat, loc.lng, chain.lat, chain.lng);
-    merged.push({
-      ...chain,
-      distanceMeters: dist
-    });
-  });
-
-  currentHalalPlaces = merged;
-  if (currentHalalTab === 'china') {
-    renderChinaGuideUI(container);
-  } else {
-    renderHalalListUI(container);
-  }
-}
-
-function renderHalalListUI(container) {
-  if (!container) return;
-
-  let filtered = currentHalalPlaces.filter(p => {
-    if (currentHalalTab === 'lamian' && p.type !== 'lamian') return false;
-    if (currentHalalTab === 'xinjiang' && p.type !== 'xinjiang') return false;
-    if (currentHalalTab === 'dine' && p.type !== 'dine') return false;
-
-    if (halalSearchQuery) {
-      const q = halalSearchQuery;
-      const match = (p.name || '').toLowerCase().includes(q) ||
-                    (p.chineseName || '').toLowerCase().includes(q) ||
-                    (p.cuisine || '').toLowerCase().includes(q) ||
-                    (p.address || '').toLowerCase().includes(q);
-      if (!match) return false;
-    }
-    return true;
-  });
-
-  // Sort by exact distance
-  filtered.sort((a, b) => (a.distanceMeters || 0) - (b.distanceMeters || 0));
-
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div style="text-align:center; padding:1.75rem 1rem; color:var(--text-muted); background:var(--card-bg); border-radius:14px; border:1px solid var(--card-border);">
-        <div style="font-size:2.2rem; margin-bottom:0.5rem;">🍽️</div>
-        <div style="font-weight:800; color:var(--text-primary); margin-bottom:0.3rem;">No specific restaurants matched your filter</div>
-        <div style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:1rem;">Tap below to launch live Google Maps search for verified Halal places</div>
-        <button class="btn-arch-solid" style="padding:0.6rem 1.25rem; border-radius:10px; margin:0 auto; font-size:0.85rem;" onclick="openLiveGoogleMapsHalal()">
-          <span>🗺️ Open in Google Maps</span>
-        </button>
-      </div>
-    `;
-    return;
-  }
-
-  container.innerHTML = filtered.map(p => {
-    const distFormatted = formatDistanceLabel(Math.round(p.distanceMeters || 450));
-    const safeChinese = (p.chineseName || "").replace(/'/g, "\\'");
-    const safeAddr = (p.chineseAddress || p.address || "").replace(/'/g, "\\'");
-
-    return `
-      <div class="halal-card-item">
-        <div class="halal-card-header">
-          <div class="halal-card-title-group">
-            <div class="halal-card-title">${p.name}</div>
-            <div class="halal-card-chinese">🇨🇳 ${p.chineseName || ''}</div>
-            <div class="halal-card-urdu">${p.urduName || ''}</div>
-          </div>
-          <div class="halal-badge-box">
-            <span class="halal-cert-badge">✅ ${p.halalCert || '100% Halal'}</span>
-            <span class="halal-distance-badge">📍 ${distFormatted}</span>
-          </div>
-        </div>
-
-        <div class="halal-card-tags">
-          ${(p.tags || []).map(t => `<span class="halal-card-tag">${t}</span>`).join('')}
-        </div>
-
-        <div class="halal-card-addr">
-          <strong>Address:</strong> ${p.address || ''}<br>
-          <span style="font-size:0.82rem; color:var(--emerald-primary); font-weight:700;">中文地址: ${p.chineseAddress || ''}</span>
-        </div>
-
-        <div class="halal-card-actions">
-          <button class="btn-halal-dir" onclick="openHalalDirections(${p.lat}, ${p.lng}, '${safeChinese}')">
-            <span>🧭 Google Maps Directions</span>
-          </button>
-          <button class="btn-halal-copy" onclick="copyHalalAddress('${safeChinese}', '${safeAddr}')">
-            <span>📋 Copy for Taxi / Didi</span>
-          </button>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function renderChinaGuideUI(container) {
-  let phrases = CHINA_SURVIVAL_PHRASES;
-  if (halalSearchQuery) {
-    const q = halalSearchQuery;
-    phrases = phrases.filter(p => 
-      p.zh.toLowerCase().includes(q) ||
-      p.pinyin.toLowerCase().includes(q) ||
-      p.en.toLowerCase().includes(q) ||
-      p.ur.toLowerCase().includes(q)
-    );
-  }
-
-  container.innerHTML = `
-    <div class="china-guide-banner">
-      <div class="china-guide-title-zh">🇨🇳 中国清真饮食与出行指南 (China Halal Guide)</div>
-      <div class="china-guide-subtitle-ur">چین کے سفر کے دوران حلال کھانے اور ٹیکسی کے لیے فوری کارآمد جملے و ہدایات</div>
-      <div style="font-size:0.75rem; opacity:0.9; margin-top:4px;">Official Islamic Association of China (中国伊斯兰教协会) Halal Tips</div>
-    </div>
-
-    <!-- Essential Tips Card -->
-    <div class="ahl-card" style="border-left:4px solid #059669;">
-      <div style="font-weight:800; font-size:0.95rem; color:var(--text-primary);">💡 How to Find Halal in Any Chinese City:</div>
-      <div class="ahl-bio-text">
-        <strong>1. Look for "清真" (Qingzhen):</strong> All Halal restaurants have this Chinese word on their main signboards, usually inside a green circle or crescent.<br><br>
-        <strong>2. Lanzhou Beef Lamian (兰州牛肉拉面):</strong> Present on almost every second street in Chinese cities. Owned by Muslim Hui families from Gansu/Qinghai, 100% Halal beef noodle soups.<br><br>
-        <strong>3. Xinjiang Muslim Food (新疆风味):</strong> Distinctive Uyghur restaurants with authentic Halal roast lamb, mutton kebabs, and pilaf.<br><br>
-        <strong>4. Show Flashcards:</strong> Tap the <strong>"🔊 Speak"</strong> or <strong>"📋 Copy"</strong> button below to let your phone speak in authentic Chinese to waitstaff or taxi drivers!
-      </div>
-    </div>
-
-    <!-- Bilingual Flashcards -->
-    ${phrases.map(phrase => {
-      const safeZh = phrase.zh.replace(/'/g, "\\'");
-      return `
-        <div class="china-phrase-card">
-          <div class="china-phrase-zh">${phrase.zh}</div>
-          <div class="china-phrase-pinyin">🗣️ ${phrase.pinyin}</div>
-          <div class="china-phrase-en">🇬🇧 ${phrase.en}</div>
-          <div class="china-phrase-ur">🇵🇰 ${phrase.ur}</div>
-          <div style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">💡 ${phrase.tip}</div>
-
-          <div class="china-phrase-actions">
-            <button class="btn-phrase-copy" onclick="speakChinaPhrase('${safeZh}')">
-              <span>🔊 Speak Aloud (Chinese)</span>
-            </button>
-            <button class="btn-phrase-copy" style="color:var(--emerald-primary); background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.3);" onclick="copyChinaPhrase('${safeZh}', '${phrase.ur}')">
-              <span>📋 Copy Chinese Text</span>
-            </button>
-          </div>
-        </div>
-      `;
-    }).join('')}
-  `;
-}
 
 // ==========================================================================
 // 20. AHL AL-BAYT & PROPHET'S ﷺ FAMILY TREE (خاندانِ نبوت و سادات)

@@ -2368,14 +2368,14 @@
         <div class="halal-gps-card">
           <div class="halal-gps-row">
             <div class="halal-gps-badge" id="halal-gps-indicator">
-              <span class="pulsing-gps-dot"></span> <span id="halal-gps-status-text">100% Accurate GPS Active</span>
+              <span class="pulsing-gps-dot"></span> <span id="halal-gps-status-text">Auto GPS Active (Worldwide)</span>
             </div>
             <button class="halal-recheck-btn" onclick="refreshHalalGpsLocation()">
               <span>🎯 Re-Lock GPS</span>
             </button>
           </div>
           <div class="halal-location-display" id="halal-current-coords-text">
-            📍 Current GPS: Detecting high-precision satellite coordinates...
+            📍 Current GPS: Auto-detecting live coordinates...
           </div>
         </div>
 
@@ -2383,30 +2383,35 @@
         <div class="open-google-maps-banner halal-maps-banner" onclick="openLiveGoogleMapsHalal()">
           <div class="open-gmaps-icon">🗺️</div>
           <div class="open-gmaps-text">
-            <div style="font-weight:800; font-size:0.95rem; color:#fff;">Live Halal Food on Google Maps</div>
-            <div style="font-size:0.75rem; color:rgba(255,255,255,0.9); margin-top:2px;">Tap to open verified Halal restaurants around your exact building</div>
+            <div style="font-weight:800; font-size:0.95rem; color:#fff;">Search Nearby Halal on Google Maps</div>
+            <div style="font-size:0.75rem; color:rgba(255,255,255,0.9); margin-top:2px;">Live real-time Halal restaurants around your exact GPS location</div>
           </div>
           <div class="open-gmaps-arrow">➔</div>
         </div>
 
-        <!-- Quick Filter Tabs -->
+        <!-- Interactive Map Container -->
+        <div class="radar-map-card">
+          <div id="halal-map-container"></div>
+        </div>
+
+        <!-- Universal Filter Tabs -->
         <div class="halal-filters-row" id="halal-filters-row">
-          <button class="halal-filter-pill active" id="halal-tab-all" onclick="filterHalalPlaces('all')">All Halal (تمام)</button>
-          <button class="halal-filter-pill" id="halal-tab-lamian" onclick="filterHalalPlaces('lamian')">兰州拉面 (Lanzhou)</button>
-          <button class="halal-filter-pill" id="halal-tab-xinjiang" onclick="filterHalalPlaces('xinjiang')">新疆特色 (Xinjiang)</button>
-          <button class="halal-filter-pill" id="halal-tab-dine" onclick="filterHalalPlaces('dine')">Dine-in / Fast Food</button>
-          <button class="halal-filter-pill" id="halal-tab-china" onclick="filterHalalPlaces('china')">🇨🇳 China Survival Guide</button>
+          <button class="halal-filter-pill active" id="halal-tab-all" onclick="filterHalalPlaces('all')">All Halal</button>
+          <button class="halal-filter-pill" id="halal-tab-restaurant" onclick="filterHalalPlaces('restaurant')">Restaurants</button>
+          <button class="halal-filter-pill" id="halal-tab-fast_food" onclick="filterHalalPlaces('fast_food')">Fast Food</button>
+          <button class="halal-filter-pill" id="halal-tab-bbq" onclick="filterHalalPlaces('bbq')">BBQ & Grills</button>
+          <button class="halal-filter-pill" id="halal-tab-cafe" onclick="filterHalalPlaces('cafe')">Cafes & Bakeries</button>
         </div>
 
         <!-- Search Input -->
         <div class="halal-search-box">
           <span style="font-size:1.1rem; opacity:0.7;">🔍</span>
-          <input type="text" id="halal-search-input" placeholder="Search restaurant name, street, or dish..." oninput="handleHalalSearch(this.value)">
+          <input type="text" id="halal-search-input" placeholder="Search restaurant name, cuisine, or street..." oninput="handleHalalSearch(this.value)">
         </div>
 
         <!-- Dynamic List & Cards Container -->
         <div class="halal-list-box" id="halal-list-container">
-          <!-- Populated by JS -->
+          <!-- Populated by live GPS and live map markers -->
         </div>
       </div>
     </section>
