@@ -7408,17 +7408,33 @@ async function fetchNearbyHalalPlaces() {
     return;
   }
 
-  container.innerHTML = `
-    <div style="text-align:center; padding:1.5rem; color:var(--text-muted); background:var(--card-bg); border-radius:12px; border:1px solid var(--card-border);">
-      <div style="font-size:2rem; margin-bottom:0.4rem;">🛰️</div>
-      <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.25rem;">Connecting to live map & scanning eateries...</div>
-      <div style="font-size:0.8rem; color:var(--text-secondary);">Querying verified live restaurants around your exact GPS coordinates</div>
-    </div>
-  `;
+  const cacheKey = `halal_places_${loc.lat.toFixed(3)}_${loc.lng.toFixed(3)}`;
+  
+  // Instant render from local cache if present
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        currentHalalPlaces = parsed;
+        renderHalalListUI();
+      }
+    }
+  } catch (e) {}
+
+  if (!currentHalalPlaces || currentHalalPlaces.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:1.5rem; color:var(--text-muted); background:var(--card-bg); border-radius:12px; border:1px solid var(--card-border);">
+        <div style="font-size:2rem; margin-bottom:0.4rem;">🛰️</div>
+        <div style="font-weight:700; color:var(--text-primary); margin-bottom:0.25rem;">Connecting to live map & scanning eateries...</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Querying verified live restaurants around your exact GPS coordinates</div>
+      </div>
+    `;
+  }
 
   clearHalalMapMarkers();
 
-  const delta = 0.045; // ~5km radius bounding box
+  const delta = 0.05; // ~5.5km radius bounding box
   const minLng = loc.lng - delta;
   const maxLng = loc.lng + delta;
   const minLat = loc.lat - delta;
@@ -7427,113 +7443,108 @@ async function fetchNearbyHalalPlaces() {
   const fetchedList = [];
   const seen = new Set();
 
-  // Multi-query parallel fetch for 100% real live data
-  const searchKeywords = ['restaurant', 'fast food', 'food', 'cafe'];
+  function parseItem(item) {
+    if (!item) return;
+    const pLat = parseFloat(item.lat);
+    const pLng = parseFloat(item.lon);
+    if (isNaN(pLat) || isNaN(pLng)) return;
 
-  try {
-    const fetchPromises = searchKeywords.map(async (keyword) => {
-      try {
-        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(keyword)}&format=json&bounded=1&viewbox=${minLng},${maxLat},${maxLng},${minLat}&limit=25`;
-        const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
-        if (!resp.ok) return [];
-        return await resp.json();
-      } catch (e) {
-        return [];
-      }
+    const key = `${pLat.toFixed(4)}_${pLng.toFixed(4)}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+
+    const fullName = item.display_name || '';
+    const nameParts = fullName.split(',');
+    const rawName = nameParts[0]?.trim() || item.name || 'Restaurant';
+
+    const lowerName = rawName.toLowerCase();
+    if (lowerName.includes('colony') || lowerName.includes('sector') || lowerName.includes('police station') || lowerName.includes('mosque') || lowerName.includes('masjid')) {
+      return;
+    }
+
+    const dist = getHaversineDistanceMeters(loc.lat, loc.lng, pLat, pLng);
+    const fullAddr = nameParts.slice(1, 4).map(s => s.trim()).join(', ') || 'Near your GPS location';
+
+    let type = 'restaurant';
+    const cLower = (rawName + ' ' + (item.type || '') + ' ' + fullAddr).toLowerCase();
+    if (cLower.includes('bbq') || cLower.includes('grill') || cLower.includes('kebab') || cLower.includes('tikka') || cLower.includes('charcoal') || cLower.includes('habibi') || cLower.includes('basti')) {
+      type = 'bbq';
+    } else if (cLower.includes('burger') || cLower.includes('pizza') || cLower.includes('fast food') || cLower.includes('shawarma') || cLower.includes('kfc') || cLower.includes('mcdonald') || cLower.includes('subway') || item.type === 'fast_food') {
+      type = 'fast_food';
+    } else if (cLower.includes('cafe') || cLower.includes('bakery') || cLower.includes('bakers') || cLower.includes('coffee') || cLower.includes('tea') || cLower.includes('dessert') || cLower.includes('rahat') || item.type === 'cafe') {
+      type = 'cafe';
+    }
+
+    let cuisine = 'Halal Dining';
+    if (type === 'fast_food') cuisine = 'Fast Food & Burgers';
+    else if (type === 'bbq') cuisine = 'BBQ & Traditional Grills';
+    else if (type === 'cafe') cuisine = 'Cafe, Bakery & Sweets';
+    else cuisine = 'Traditional Cuisine';
+
+    fetchedList.push({
+      name: rawName,
+      type: type,
+      cuisine: cuisine,
+      address: fullAddr,
+      lat: pLat,
+      lng: pLng,
+      distanceMeters: dist
     });
-
-    const resultsArray = await Promise.all(fetchPromises);
-
-    resultsArray.forEach(items => {
-      if (!Array.isArray(items)) return;
-      items.forEach(item => {
-        const pLat = parseFloat(item.lat);
-        const pLng = parseFloat(item.lon);
-        if (isNaN(pLat) || isNaN(pLng)) return;
-
-        const key = `${pLat.toFixed(4)}_${pLng.toFixed(4)}`;
-        if (seen.has(key)) return;
-        seen.add(key);
-
-        const fullName = item.display_name || '';
-        const nameParts = fullName.split(',');
-        const rawName = nameParts[0]?.trim() || 'Restaurant';
-
-        // Filter out non-eatery place names if any
-        const lowerName = rawName.toLowerCase();
-        if (lowerName.includes('colony') || lowerName.includes('sector') || lowerName.includes('police station') || lowerName.includes('mosque') || lowerName.includes('masjid')) {
-          return;
-        }
-
-        const dist = getHaversineDistanceMeters(loc.lat, loc.lng, pLat, pLng);
-        const fullAddr = nameParts.slice(1, 4).map(s => s.trim()).join(', ') || 'Near your GPS location';
-
-        // Categorize into filter categories: 'restaurant', 'fast_food', 'bbq', 'cafe'
-        let type = 'restaurant';
-        const cLower = (rawName + ' ' + (item.type || '') + ' ' + fullAddr).toLowerCase();
-        if (cLower.includes('bbq') || cLower.includes('grill') || cLower.includes('kebab') || cLower.includes('tikka') || cLower.includes('charcoal') || cLower.includes('habibi') || cLower.includes('basti')) {
-          type = 'bbq';
-        } else if (cLower.includes('burger') || cLower.includes('pizza') || cLower.includes('fast food') || cLower.includes('shawarma') || cLower.includes('kfc') || cLower.includes('mcdonald') || cLower.includes('subway') || item.type === 'fast_food') {
-          type = 'fast_food';
-        } else if (cLower.includes('cafe') || cLower.includes('bakery') || cLower.includes('bakers') || cLower.includes('coffee') || cLower.includes('tea') || cLower.includes('dessert') || cLower.includes('rahat') || item.type === 'cafe') {
-          type = 'cafe';
-        }
-
-        let cuisine = 'Halal Dining';
-        if (type === 'fast_food') cuisine = 'Fast Food & Burgers';
-        else if (type === 'bbq') cuisine = 'BBQ & Traditional Grills';
-        else if (type === 'cafe') cuisine = 'Cafe, Bakery & Sweets';
-        else cuisine = 'Traditional Cuisine';
-
-        fetchedList.push({
-          name: rawName,
-          type: type,
-          cuisine: cuisine,
-          address: fullAddr,
-          lat: pLat,
-          lng: pLng,
-          distanceMeters: dist
-        });
-      });
-    });
-  } catch (e) {
-    console.warn("Live Nominatim fetch notice:", e);
   }
 
-  // Also query Overpass in parallel if Nominatim returned low count
-  if (fetchedList.length < 5) {
+  // Safe fetch helper with strict AbortController timeout
+  async function fetchWithTimeout(url, timeoutMs = 3800) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const query = `[out:json][timeout:10];(node["amenity"~"restaurant|fast_food|cafe"](around:4000,${loc.lat},${loc.lng});way["amenity"~"restaurant|fast_food|cafe"](around:4000,${loc.lat},${loc.lng}););out center 30;`;
-      const opResp = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
-      if (opResp.ok) {
-        const opData = await opResp.json();
-        const elems = opData.elements || [];
-        elems.forEach(el => {
-          const eLat = el.lat || el.center?.lat;
-          const eLon = el.lon || el.center?.lon;
-          if (!eLat || !eLon) return;
-          const key = `${eLat.toFixed(4)}_${eLon.toFixed(4)}`;
-          if (seen.has(key)) return;
-          seen.add(key);
-          const tags = el.tags || {};
-          const name = tags.name || tags["name:en"] || tags["name:ur"] || "Restaurant";
-          const dist = getHaversineDistanceMeters(loc.lat, loc.lng, eLat, eLon);
-          const street = tags["addr:street"] || tags["addr:suburb"] || tags["addr:city"] || "Near your GPS location";
-          fetchedList.push({
-            name: name,
-            type: el.tags?.amenity === 'fast_food' ? 'fast_food' : (el.tags?.amenity === 'cafe' ? 'cafe' : 'restaurant'),
-            cuisine: tags.cuisine || 'Halal Food',
-            address: street,
-            lat: eLat,
-            lng: eLon,
-            distanceMeters: dist
-          });
-        });
+      const response = await fetch(url, {
+        headers: { 'Accept': 'application/json' },
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      return null;
+    }
+  }
+
+  try {
+    // Primary query: High yield 'restaurant'
+    const url1 = `https://nominatim.openstreetmap.org/search?format=json&q=restaurant&viewbox=${minLng},${maxLat},${maxLng},${minLat}&bounded=1&limit=50`;
+    const resp1 = await fetchWithTimeout(url1, 3800);
+    if (resp1 && resp1.ok) {
+      const data1 = await resp1.json();
+      if (Array.isArray(data1)) {
+        data1.forEach(parseItem);
+      }
+    }
+  } catch (e) {
+    console.warn("Primary fetch error:", e);
+  }
+
+  // Secondary query: 'food' if fewer than 8 places found
+  if (fetchedList.length < 8) {
+    try {
+      const url2 = `https://nominatim.openstreetmap.org/search?format=json&q=food&viewbox=${minLng},${maxLat},${maxLng},${minLat}&bounded=1&limit=30`;
+      const resp2 = await fetchWithTimeout(url2, 2800);
+      if (resp2 && resp2.ok) {
+        const data2 = await resp2.json();
+        if (Array.isArray(data2)) {
+          data2.forEach(parseItem);
+        }
       }
     } catch (e) {}
   }
 
-  currentHalalPlaces = fetchedList;
+  if (fetchedList.length > 0) {
+    currentHalalPlaces = fetchedList;
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(fetchedList));
+    } catch (e) {}
+  }
+
+  // GUARANTEED: Always render UI and markers, never stay stuck in loading
   renderHalalListUI();
 }
 window.fetchNearbyHalalPlaces = fetchNearbyHalalPlaces;
