@@ -156,6 +156,34 @@ class MainViewModel(
         }
     }
 
+    fun setManualLocation(lat: Double, lng: Double, name: String) {
+        viewModelScope.launch {
+            val loc = android.location.Location("manual_pinpoint").apply {
+                latitude = lat
+                longitude = lng
+                accuracy = 5.0f
+                time = System.currentTimeMillis()
+            }
+            _currentLocation.value = loc
+            settingsRepository.saveLocation(
+                latitude = lat,
+                longitude = lng,
+                name = name,
+                accuracy = 5.0f
+            )
+            val currentSettings = _userSettings.value
+            if (currentSettings != null) {
+                recalculatePrayerTimes(lat, lng, currentSettings)
+                prayerAlarmScheduler.scheduleAlarms(
+                    latitude = lat,
+                    longitude = lng,
+                    settings = currentSettings
+                )
+            }
+            loadNearbyMosques(lat, lng, forceRefresh = true)
+        }
+    }
+
     fun setCalculationMethod(method: String) {
         viewModelScope.launch {
             settingsRepository.setCalculationMethod(method)

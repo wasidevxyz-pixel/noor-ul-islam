@@ -147,20 +147,36 @@ class AzanAlarmReceiver : BroadcastReceiver() {
                 val prayerTime = intent.getStringExtra(EXTRA_PRAYER_TIME) ?: ""
                 val soundName = intent.getStringExtra(EXTRA_AZAN_SOUND) ?: "makkah"
 
-                Log.d(TAG, "Triggering Azan notification and audio for $prayerName ($prayerTime)")
-
-                // 1. Immediately show high-priority heads-up notification (works even if service is delayed)
-                AzanNotificationManager.showPrayerNotification(context, prayerName, prayerTime)
-
-                // 2. Launch Foreground Service for rock-solid audio playback even when app is killed
-                AzanPlaybackService.start(context, prayerName, prayerTime, soundName)
-
-                // 3. Reschedule prayer alarms
                 val pendingResult = goAsync()
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
                         val dataStore = UserSettingsDataStore(context)
                         val settings = dataStore.userSettingsFlow.first()
+
+                        // Strictly respect user's on/off toggle for this prayer
+                        val isEnabled = when (prayerName.lowercase()) {
+                            "fajr" -> settings.azanFajr
+                            "dhuhr" -> settings.azanDhuhr
+                            "asr" -> settings.azanAsr
+                            "maghrib" -> settings.azanMaghrib
+                            "isha" -> settings.azanIsha
+                            else -> true
+                        }
+
+                        if (!isEnabled) {
+                            Log.d(TAG, "Azan alarm for $prayerName is DISABLED in user settings. Skipping notification and audio.")
+                            return@launch
+                        }
+
+                        Log.d(TAG, "Triggering Azan notification and audio for $prayerName ($prayerTime)")
+
+                        // 1. Immediately show high-priority heads-up notification
+                        AzanNotificationManager.showPrayerNotification(context, prayerName, prayerTime)
+
+                        // 2. Launch Foreground Service for audio playback
+                        AzanPlaybackService.start(context, prayerName, prayerTime, soundName)
+
+                        // 3. Reschedule prayer alarms
                         val scheduler = PrayerAlarmScheduler(context)
                         val effLat = if (settings.hasHomeLocation && settings.homeLatitude != 0.0) settings.homeLatitude else 33.6844
                         val effLng = if (settings.hasHomeLocation && settings.homeLongitude != 0.0) settings.homeLongitude else 73.0479
@@ -171,7 +187,7 @@ class AzanAlarmReceiver : BroadcastReceiver() {
                             settings = settings
                         )
                     } catch (e: Exception) {
-                        Log.e(TAG, "Error rescheduling alarms after azan: ${e.message}", e)
+                        Log.e(TAG, "Error handling prayer alarm: ${e.message}", e)
                     } finally {
                         pendingResult.finish()
                     }

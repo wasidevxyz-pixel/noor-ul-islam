@@ -87,7 +87,10 @@ class PrayerAlarmScheduler(private val context: Context) {
                     else -> true
                 }
 
-                if (!isEnabled) continue
+                if (!isEnabled) {
+                    cancelSpecificAlarm(name, dayOffset)
+                    continue
+                }
 
                 val triggerMillis = zonedDateTime.toInstant().toEpochMilli()
 
@@ -230,6 +233,24 @@ class PrayerAlarmScheduler(private val context: Context) {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to schedule alarm for $tag: ${e.message}", e)
+        }
+    }
+
+    fun cancelSpecificAlarm(prayerName: String, dayOffset: Int) {
+        val intent = Intent(context, AzanAlarmReceiver::class.java).apply {
+            action = AzanAlarmReceiver.ACTION_PRAYER_ALARM
+        }
+        val requestCode = getRequestCode(prayerName, dayOffset)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+        if (pendingIntent != null) {
+            alarmManager.cancel(pendingIntent)
+            pendingIntent.cancel()
+            Log.d(TAG, "Cancelled alarm for $prayerName (dayOffset $dayOffset, requestCode $requestCode)")
         }
     }
 

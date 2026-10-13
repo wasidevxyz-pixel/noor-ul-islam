@@ -147,12 +147,20 @@ object AzanNotificationManager {
             }
         }
 
+        val targetScreen = if (title.contains("Hadith", ignoreCase = true) || title.contains("حدیث", ignoreCase = true)) {
+            "hadith-day"
+        } else {
+            "ayat-day"
+        }
+
         val openAppIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("EXTRA_TARGET_SCREEN", targetScreen)
         }
+        val requestCode = if (targetScreen == "hadith-day") 201 else 202
         val openPendingIntent = PendingIntent.getActivity(
             context,
-            2,
+            requestCode,
             openAppIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -191,10 +199,11 @@ object AzanNotificationManager {
 
         val openAppIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("EXTRA_TARGET_SCREEN", "tasbih")
         }
         val openPendingIntent = PendingIntent.getActivity(
             context,
-            3,
+            203,
             openAppIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

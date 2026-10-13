@@ -88,6 +88,12 @@
         <div class="drawer-nav-item" onclick="navigateTo('mosques'); closeSideDrawer();">
           <span>📍</span> <span>Nearby Mosques</span>
         </div>
+        <div class="drawer-nav-item" onclick="navigateTo('halal-restaurants'); closeSideDrawer();">
+          <span>🍽️</span> <span>Nearby Halal Food (حلال ریسٹورنٹ)</span>
+        </div>
+        <div class="drawer-nav-item" onclick="navigateTo('ahl-bayt'); closeSideDrawer();">
+          <span>👑</span> <span>خاندانِ نبوت و اہل بیت (Ahl al-Bayt)</span>
+        </div>
         <div class="drawer-nav-item" onclick="navigateTo('ayat-day'); closeSideDrawer();">
           <span>✨</span> <span>Ayat of the Day</span>
         </div>
@@ -343,7 +349,7 @@
            ====================================================================== -->
       <section class="home-azkar-card" id="home-azkar-card">
         <div class="azkar-card-top">
-          <div style="display:flex; align-items:center; gap:0.4rem; font-weight:800; font-size:0.92rem; color:var(--text-primary);">
+          <div class="azkar-top-title-wrap">
             <span id="azkar-hero-icon">🌅</span>
             <span id="azkar-hero-title">Morning Azkar (صبح کے اذکار)</span>
           </div>
@@ -1042,7 +1048,7 @@
           <button style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.1rem;" onclick="clearFullSearch()">✕</button>
         </div>
 
-        <div style="display:flex; gap:0.4rem; overflow-x:auto; margin-bottom:1rem; padding-bottom:2px; scrollbar-width:none;">
+        <div class="quran-search-filters-row" style="display:flex; gap:0.4rem; overflow-x:auto; margin-bottom:1rem; padding-bottom:2px; scrollbar-width:none;">
           <button class="sound-pill active" id="search-filter-all" onclick="setSearchFilter('all')">All (سب)</button>
           <button class="sound-pill" id="search-filter-surah" onclick="setSearchFilter('surah')">📖 Surah</button>
           <button class="sound-pill" id="search-filter-para" onclick="setSearchFilter('para')">📜 Para</button>
@@ -1521,6 +1527,18 @@
             <span class="more-tool-desc">Find closest places of worship</span>
           </div>
 
+          <div class="more-tool-card" onclick="navigateTo('halal-restaurants')" style="border-color: rgba(16, 185, 129, 0.4); background: linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(4,120,87,0.08) 100%);">
+            <span class="more-tool-icon">🍽️</span>
+            <span class="more-tool-title">Nearby Halal Food (حلال ریسٹورنٹ)</span>
+            <span class="more-tool-desc">GPS & Google Maps walking directions (China & Worldwide)</span>
+          </div>
+
+          <div class="more-tool-card" onclick="navigateTo('ahl-bayt')" style="border-color: rgba(212, 175, 55, 0.4); background: linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(14,62,47,0.08) 100%);">
+            <span class="more-tool-icon">👑</span>
+            <span class="more-tool-title">خاندانِ نبوت و سادات (Ahl al-Bayt)</span>
+            <span class="more-tool-desc">حضور ﷺ کی ۴ بیٹیاں، داماد، حسنین کریمین اور ساداتِ عظام کا مکمل شجرہ</span>
+          </div>
+
           <div class="more-tool-card" onclick="navigateTo('madhab')">
             <span class="more-tool-icon">🕌</span>
             <span class="more-tool-title">Madhab Settings</span>
@@ -1708,9 +1726,10 @@
       </header>
 
       <div class="guide-content-wrapper">
-        <div class="ramadan-hero-banner" style="margin-bottom:0;">
-          <div style="font-family: var(--font-arabic); font-size: 1.65rem; color: #fef08a; direction:rtl; text-align:right;">عُمْرَةٌ مَبْرُورَةٌ</div>
-          <div style="font-size:0.88rem; line-height:1.6; margin-top:0.35rem;">
+        <div class="ramadan-hero-banner" style="margin-bottom:0; text-align:center;">
+          <div style="font-family: var(--font-arabic); font-size: 1.75rem; color: #fef08a; text-align:center;">عُمْرَةٌ مَبْرُورَةٌ</div>
+          <div style="font-family: var(--font-urdu); font-size: 1.15rem; color: #ffffff; margin-top:4px; text-align:center;">عمرہ کا مکمل و مسنون طریقہ</div>
+          <div style="font-size:0.86rem; line-height:1.6; margin-top:0.35rem; text-align:center; max-width:92%; margin-left:auto; margin-right:auto;">
             عمرہ سنتِ مؤکدہ ہے۔ فقہ حنفی کے مطابق عمرہ کے <strong>۲ فرض</strong> (احرام اور طواف) اور <strong>۲ واجب</strong> (سعی اور حلق/قصر) ہیں۔
           </div>
         </div>
@@ -1808,9 +1827,10 @@
       </header>
 
       <div class="guide-content-wrapper">
-        <div class="ramadan-hero-banner" style="margin-bottom:0;">
-          <div style="font-family: var(--font-arabic); font-size: 1.65rem; color: #fef08a; direction:rtl; text-align:right;">حَجٌّ مَّبْرُورٌ</div>
-          <div style="font-size:0.88rem; line-height:1.6; margin-top:0.35rem;">
+        <div class="ramadan-hero-banner" style="margin-bottom:0; text-align:center;">
+          <div style="font-family: var(--font-arabic); font-size: 1.75rem; color: #fef08a; text-align:center;">حَجٌّ مَّبْرُورٌ</div>
+          <div style="font-family: var(--font-urdu); font-size: 1.15rem; color: #ffffff; margin-top:4px; text-align:center;">حج کا مکمل مسنون طریقہ و احکام</div>
+          <div style="font-size:0.86rem; line-height:1.6; margin-top:0.35rem; text-align:center; max-width:92%; margin-left:auto; margin-right:auto;">
             حج اسلام کا پانچواں بنیادی رکن ہے۔ فقہ حنفی میں حج کے <strong>۳ فرائض</strong> (احرام، وقوفِ عرفات، طوافِ زیارت) اور <strong>۶ واجبات</strong> ہیں۔ ذیل میں ۸ تا ۱۲ ذوالحجہ کا مکمل شیڈول و احکام ہیں۔
           </div>
         </div>
@@ -1895,9 +1915,10 @@
       </header>
 
       <div class="sources-content-wrapper">
-        <div class="ramadan-hero-banner" style="margin-bottom:0;">
-          <div style="font-family: var(--font-arabic); font-size: 1.5rem; color: #fef08a; direction:rtl; text-align:right;">بِسْمِ اللَّهِ الرَّحْمٰنِ الرَّحِيمِ</div>
-          <div style="font-size:0.86rem; line-height:1.6; margin-top:0.4rem;">
+        <div class="ramadan-hero-banner" style="margin-bottom:0; text-align:center;">
+          <div style="font-family: var(--font-arabic); font-size: 1.65rem; color: #fef08a; text-align:center;">بِسْمِ اللَّهِ الرَّحْمٰنِ الرَّحِيمِ</div>
+          <div style="font-family: var(--font-urdu); font-size: 1.15rem; color: #ffffff; margin-top:4px; text-align:center;">مصدقہ عالمی مآخذ اور قرآنی و حدیثی اسناد</div>
+          <div style="font-size:0.86rem; line-height:1.6; margin-top:0.4rem; text-align:center; max-width:92%; margin-left:auto; margin-right:auto;">
             نور الاسلام ایپ کا تمام تر قرآنی، احادیث اور دعاؤں کا مواد <strong>۱۰۰٪ مستند اور مصدقہ عالمی مآخذ</strong> سے لیا گیا ہے۔ ذیل میں تمام مکمل اسناد و تفاصیل شفافیت کے ساتھ پیش ہیں:
           </div>
         </div>
@@ -2125,10 +2146,10 @@
 
       <div class="names-wrapper">
         <!-- Hero Header -->
-        <div class="names-hero-header">
-          <div style="font-family:var(--font-arabic); font-size:1.6rem; color:#fef08a; font-weight:700;">أَسْمَاءُ الْأَوْلَادِ وَالْبَنَاتِ</div>
-          <div style="font-family:var(--font-urdu); font-size:1.1rem; margin-top:2px;">بچوں اور بچیوں کے خوبصورت اسلامی نام مع معانی</div>
-          <div style="font-size:0.8rem; opacity:0.88; margin-top:0.25rem;">Authentic Muslim Baby Names with Urdu & English meanings, origin & Prophetic virtues.</div>
+        <div class="names-hero-header" style="text-align: center;">
+          <div style="font-family:var(--font-arabic); font-size:1.65rem; color:#fef08a; font-weight:700; text-align:center;">أَسْمَاءُ الْأَوْلَادِ وَالْبَنَاتِ</div>
+          <div style="font-family:var(--font-urdu); font-size:1.15rem; margin-top:4px; text-align:center;">بچوں اور بچیوں کے خوبصورت اسلامی نام مع معانی</div>
+          <div style="font-size:0.8rem; opacity:0.88; margin-top:0.35rem; text-align:center; max-width:92%; margin-left:auto; margin-right:auto;">Authentic Muslim Baby Names with Urdu & English meanings, origin & Prophetic virtues.</div>
         </div>
 
         <!-- Search Bar with Instant Filter -->
@@ -2209,10 +2230,10 @@
       </header>
 
       <div class="kalimas-wrapper">
-        <div class="names-banner-card" style="background: linear-gradient(135deg, #0e3e2f 0%, #064e3b 60%, #b45309 100%);">
-          <div style="font-family:var(--font-arabic); font-size:1.6rem; color:#fef08a; font-weight:700;">الكَلِمَاتُ السِّتَّة فِي الْإِسْلَام</div>
-          <div style="font-family:var(--font-urdu); font-size:1.15rem; margin-top:2px;">اسلام کے چھ بنیادی کلمے مع ترجمہ و رومن</div>
-          <div style="font-size:0.8rem; opacity:0.88; margin-top:0.25rem;">Arabic text with Harkat, Urdu & English meanings, and Roman transliteration.</div>
+        <div class="names-banner-card" style="background: linear-gradient(135deg, #0e3e2f 0%, #064e3b 60%, #b45309 100%); text-align: center;">
+          <div style="font-family:var(--font-arabic); font-size:1.65rem; color:#fef08a; font-weight:700; text-align:center;">الكَلِمَاتُ السِّتَّة فِي الْإِسْلَام</div>
+          <div style="font-family:var(--font-urdu); font-size:1.18rem; margin-top:4px; text-align:center;">اسلام کے چھ بنیادی کلمے مع ترجمہ و رومن</div>
+          <div style="font-size:0.8rem; opacity:0.88; margin-top:0.35rem; text-align:center; max-width:92%; margin-left:auto; margin-right:auto;">Arabic text with Harkat, Urdu & English meanings, and Roman transliteration.</div>
         </div>
 
         <div id="six-kalimas-list-container">
@@ -2236,10 +2257,10 @@
       </header>
 
       <div class="duas-wrapper">
-        <div class="names-banner-card" style="background: linear-gradient(135deg, #064e3b 0%, #047857 70%, #d97706 100%);">
-          <div style="font-family:var(--font-arabic); font-size:1.6rem; color:#fef08a; font-weight:700;">حِصْنُ الْمُسْلِمِ مِنَ الْأَدْعِيَةِ النَّبَوِيَّة</div>
-          <div style="font-family:var(--font-urdu); font-size:1.15rem; margin-top:2px;">روزمرہ معمولات کی مستند مسنون دعائیں</div>
-          <div style="font-size:0.8rem; opacity:0.88; margin-top:0.25rem;">Authentic Supplications for Eating, Home, Sleep, Masjid, Travel & Protection.</div>
+        <div class="names-banner-card" style="background: linear-gradient(135deg, #064e3b 0%, #047857 70%, #d97706 100%); text-align: center;">
+          <div style="font-family:var(--font-arabic); font-size:1.65rem; color:#fef08a; font-weight:700; text-align:center;">حِصْنُ الْمُسْلِمِ مِنَ الْأَدْعِيَةِ النَّبَوِيَّة</div>
+          <div style="font-family:var(--font-urdu); font-size:1.18rem; margin-top:4px; text-align:center;">روزمرہ معمولات کی مستند مسنون دعائیں</div>
+          <div style="font-size:0.8rem; opacity:0.88; margin-top:0.35rem; text-align:center; max-width:92%; margin-left:auto; margin-right:auto;">Authentic Supplications for Eating, Home, Sleep, Masjid, Travel & Protection.</div>
         </div>
 
         <div class="names-search-bar" style="margin-bottom:0.75rem;">
@@ -2273,10 +2294,10 @@
       </header>
 
       <div class="wudu-wrapper">
-        <div class="names-banner-card" style="background: linear-gradient(135deg, #1e3a8a 0%, #0369a1 60%, #059669 100%);">
-          <div style="font-family:var(--font-arabic); font-size:1.6rem; color:#fef08a; font-weight:700;">طَرِيقَةُ الْوُضُوءِ وَأَحْكَامُ الطَّهَارَة</div>
-          <div style="font-family:var(--font-urdu); font-size:1.15rem; margin-top:2px;">وضو کا مسنون طریقہ، فرائض، سنتیں اور نواقض</div>
-          <div style="font-size:0.8rem; opacity:0.88; margin-top:0.25rem;">Complete Islamic ablution guide according to authentic Sunnah with step-by-step illustrations.</div>
+        <div class="names-banner-card" style="background: linear-gradient(135deg, #1e3a8a 0%, #0369a1 60%, #059669 100%); text-align: center;">
+          <div style="font-family:var(--font-arabic); font-size:1.65rem; color:#fef08a; font-weight:700; text-align:center;">طَرِيقَةُ الْوُضُوءِ وَأَحْكَامُ الطَّهَارَة</div>
+          <div style="font-family:var(--font-urdu); font-size:1.18rem; margin-top:4px; text-align:center;">وضو کا مسنون طریقہ، فرائض، سنتیں اور نواقض</div>
+          <div style="font-size:0.8rem; opacity:0.88; margin-top:0.35rem; text-align:center; max-width:92%; margin-left:auto; margin-right:auto;">Complete Islamic ablution guide according to authentic Sunnah with step-by-step illustrations.</div>
         </div>
 
         <div class="wudu-tabs-row">
@@ -2309,10 +2330,10 @@
       </header>
 
       <div class="wudu-wrapper">
-        <div class="names-banner-card" style="background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #0f766e 100%);">
-          <div style="font-family:var(--font-arabic); font-size:1.6rem; color:#fef08a; font-weight:700;">طَرِيقَةُ الصَّلَاةِ كَمَا صَلَّىٰ النَّبِيُّ ﷺ</div>
-          <div style="font-family:var(--font-urdu); font-size:1.2rem; margin-top:2px;">نماز کا مکمل و مسنون طریقہ مع تفصیلی احکام</div>
-          <div style="font-size:0.8rem; opacity:0.9; margin-top:0.25rem;">Complete step-by-step prayer guide with Surah examples, translations, and Rak'ats chart.</div>
+        <div class="names-banner-card" style="background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #0f766e 100%); text-align: center;">
+          <div style="font-family:var(--font-arabic); font-size:1.65rem; color:#fef08a; font-weight:700; text-align:center;">طَرِيقَةُ الصَّلَاةِ كَمَا صَلَّىٰ النَّبِيُّ ﷺ</div>
+          <div style="font-family:var(--font-urdu); font-size:1.2rem; margin-top:4px; text-align:center;">نماز کا مکمل و مسنون طریقہ مع تفصیلی احکام</div>
+          <div style="font-size:0.8rem; opacity:0.9; margin-top:0.35rem; text-align:center; max-width:92%; margin-left:auto; margin-right:auto;">Complete step-by-step prayer guide with Surah examples, translations, and Rak'ats chart.</div>
         </div>
 
         <div class="wudu-tabs-row" id="namaz-tabs-row">
@@ -2323,6 +2344,107 @@
         </div>
 
         <div id="namaz-guide-content-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 27: NEARBY HALAL RESTAURANTS & CHINA HALAL GUIDE (#view-halal-restaurants)
+         ========================================================================== -->
+    <section id="view-halal-restaurants" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()" aria-label="Go Back">←</button>
+        </div>
+        <div class="header-title">Nearby Halal Food <span class="urdu-title-badge" dir="rtl">(حلال ریسٹورنٹس)</span></div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="refreshHalalGpsLocation()" title="Refresh Accurate GPS">🔄</button>
+        </div>
+      </header>
+
+      <div class="halal-content-wrapper">
+        <!-- Live GPS Satellite Lock Card -->
+        <div class="halal-gps-card">
+          <div class="halal-gps-row">
+            <div class="halal-gps-badge" id="halal-gps-indicator">
+              <span class="pulsing-gps-dot"></span> <span id="halal-gps-status-text">100% Accurate GPS Active</span>
+            </div>
+            <button class="halal-recheck-btn" onclick="refreshHalalGpsLocation()">
+              <span>🎯 Re-Lock GPS</span>
+            </button>
+          </div>
+          <div class="halal-location-display" id="halal-current-coords-text">
+            📍 Current GPS: Detecting high-precision satellite coordinates...
+          </div>
+        </div>
+
+        <!-- Live Google Maps Direct Search Banner -->
+        <div class="open-google-maps-banner halal-maps-banner" onclick="openLiveGoogleMapsHalal()">
+          <div class="open-gmaps-icon">🗺️</div>
+          <div class="open-gmaps-text">
+            <div style="font-weight:800; font-size:0.95rem; color:#fff;">Live Halal Food on Google Maps</div>
+            <div style="font-size:0.75rem; color:rgba(255,255,255,0.9); margin-top:2px;">Tap to open verified Halal restaurants around your exact building</div>
+          </div>
+          <div class="open-gmaps-arrow">➔</div>
+        </div>
+
+        <!-- Quick Filter Tabs -->
+        <div class="halal-filters-row" id="halal-filters-row">
+          <button class="halal-filter-pill active" id="halal-tab-all" onclick="filterHalalPlaces('all')">All Halal (تمام)</button>
+          <button class="halal-filter-pill" id="halal-tab-lamian" onclick="filterHalalPlaces('lamian')">兰州拉面 (Lanzhou)</button>
+          <button class="halal-filter-pill" id="halal-tab-xinjiang" onclick="filterHalalPlaces('xinjiang')">新疆特色 (Xinjiang)</button>
+          <button class="halal-filter-pill" id="halal-tab-dine" onclick="filterHalalPlaces('dine')">Dine-in / Fast Food</button>
+          <button class="halal-filter-pill" id="halal-tab-china" onclick="filterHalalPlaces('china')">🇨🇳 China Survival Guide</button>
+        </div>
+
+        <!-- Search Input -->
+        <div class="halal-search-box">
+          <span style="font-size:1.1rem; opacity:0.7;">🔍</span>
+          <input type="text" id="halal-search-input" placeholder="Search restaurant name, street, or dish..." oninput="handleHalalSearch(this.value)">
+        </div>
+
+        <!-- Dynamic List & Cards Container -->
+        <div class="halal-list-box" id="halal-list-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SCREEN 28: AHL AL-BAYT & PROPHET'S ﷺ FAMILY TREE (#view-ahl-bayt)
+         ========================================================================== -->
+    <section id="view-ahl-bayt" class="app-screen">
+      <header class="screen-header">
+        <div class="header-left">
+          <button class="header-icon-btn" onclick="navigateBack()" aria-label="Go Back">←</button>
+        </div>
+        <div class="header-title">Ahl al-Bayt <span class="urdu-title-badge" dir="rtl">(خاندانِ نبوت و سادات)</span></div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="shareAhlBaytContent()" title="Share Ahl al-Bayt">🔗</button>
+        </div>
+      </header>
+
+      <div class="ahl-bayt-wrapper">
+        <!-- Sacred Introduction Banner -->
+        <div class="names-banner-card ahl-bayt-hero-banner">
+          <div class="ahl-bayt-quran-verse">إِنَّمَا يُرِيدُ اللَّهُ لِيُذْهِبَ عَنكُمُ الرِّجْسَ أَهْلَ الْبَيْتِ وَيُطَهِّرَكُمْ تَطْهِيرًا</div>
+          <div class="ahl-bayt-urdu-subtitle">حضور سرورِ کائنات ﷺ کی ازواجِ مطہرات، چار صاحبزادیاں، داماد، حسنین کریمین اور ساداتِ عظام کا مستند تذکرہ</div>
+          <div class="ahl-bayt-meta-badge">مصدقہ اسناد: قرآن مجید (احزاب: ۳۳)، صحیح بخاری، صحیح مسلم، البدایہ والنہایہ و سیرت ابن ہشام</div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="wudu-tabs-row ahl-bayt-tabs-row" id="ahl-bayt-tabs-row">
+          <button class="wudu-tab-btn active" id="ahl-tab-daughters" onclick="selectAhlBaytTab('daughters')">۴ صاحبزادیاں و داماد (Daughters)</button>
+          <button class="wudu-tab-btn" id="ahl-tab-syed" onclick="selectAhlBaytTab('syed')">حسنین کریمین و سادات (Syed Lineage)</button>
+          <button class="wudu-tab-btn" id="ahl-tab-parents" onclick="selectAhlBaytTab('parents')">شجرۂ نسب و چچا (Parents & Uncles)</button>
+          <button class="wudu-tab-btn" id="ahl-tab-wives" onclick="selectAhlBaytTab('wives')">امہات المؤمنین (Mothers of Believers)</button>
+          <button class="wudu-tab-btn" id="ahl-tab-sons" onclick="selectAhlBaytTab('sons')">صاحبزادگان (Noble Sons)</button>
+          <button class="wudu-tab-btn" id="ahl-tab-sources" onclick="selectAhlBaytTab('sources')">مستند کتب و مآخذ (Verified Sources)</button>
+        </div>
+
+        <!-- Dynamic Content Body -->
+        <div id="ahl-bayt-content-container">
           <!-- Populated by JS -->
         </div>
       </div>

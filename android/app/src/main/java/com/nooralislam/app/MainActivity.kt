@@ -135,8 +135,8 @@ class MainActivity : AppCompatActivity() {
         settings.mediaPlaybackRequiresUserGesture = false
         settings.builtInZoomControls = false
         settings.displayZoomControls = false
-        settings.useWideViewPort = false
-        settings.loadWithOverviewMode = false
+        settings.useWideViewPort = true
+        settings.loadWithOverviewMode = true
         settings.databaseEnabled = true
         val connectivityManager = getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
         settings.cacheMode = WebSettings.LOAD_NO_CACHE
@@ -207,6 +207,7 @@ class MainActivity : AppCompatActivity() {
                         notifyWebviewLocation(resolvedLoc, resolvedName)
                     }
                 }
+                handleIntentNavigation(intent)
             }
         }
 
@@ -381,6 +382,19 @@ class MainActivity : AppCompatActivity() {
         runOnUiThread {
             webView.clearCache(true)
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntentNavigation(intent)
+    }
+
+    private fun handleIntentNavigation(intent: Intent?) {
+        val targetScreen = intent?.getStringExtra("EXTRA_TARGET_SCREEN") ?: return
+        intent.removeExtra("EXTRA_TARGET_SCREEN")
+        val js = "if(typeof navigateTo === 'function'){ navigateTo('$targetScreen'); }"
+        webView.postDelayed({ webView.evaluateJavascript(js, null) }, 350)
     }
 
     override fun onDestroy() {

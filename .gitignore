@@ -8,8 +8,9 @@ bin/
 gen/
 out/
 
-# Intermediate APKs inside build folder
+# Intermediate APKs inside build folder and root
 android/app/build/outputs/
+*.apk
 
 # Local configuration file (SDK location, etc.)
 local.properties

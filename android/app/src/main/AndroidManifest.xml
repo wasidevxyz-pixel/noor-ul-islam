@@ -76,6 +76,56 @@
             </intent-filter>
         </receiver>
 
+        <!-- Home Screen AppWidget 1: Master Islamic Dashboard (Clock, Weather, Prayers) -->
+        <receiver
+            android:name=".widget.PrayerAppWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.nooralislam.app.ACTION_UPDATE_WIDGET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/prayer_appwidget_info" />
+        </receiver>
+
+        <!-- Home Screen AppWidget 2: Dedicated Namaz Times Bar -->
+        <receiver
+            android:name=".widget.NamazBarWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.nooralislam.app.ACTION_UPDATE_NAMAZ_WIDGET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/namaz_bar_appwidget_info" />
+        </receiver>
+
+        <!-- Home Screen AppWidget 3: Islamic Clock & Live Weather -->
+        <receiver
+            android:name=".widget.IslamicClockWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.nooralislam.app.ACTION_UPDATE_CLOCK_WIDGET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/islamic_clock_appwidget_info" />
+        </receiver>
+
+        <!-- FileProvider for sharing Islamic status images to WhatsApp & other apps -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
 
 </manifest>
