@@ -7887,6 +7887,18 @@ body.dark-theme .halal-filter-pill.active {
   color: var(--text-muted);
 }
 
+.custom-food-marker,
+.custom-user-gps-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+@keyframes pulseGps {
+  0% { transform: scale(0.6); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 0.3; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
 .halal-list-box {
   display: flex;
   flex-direction: column;
