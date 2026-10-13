@@ -6560,7 +6560,8 @@ function openMosqueDirections(name, lat, lng) {
   if (loc && loc.lat && loc.lng) {
     originParam = `&origin=${loc.lat},${loc.lng}`;
   }
-  const url = `https://www.google.com/maps/dir/?api=1${originParam}&destination=${lat},${lng}&travelmode=walking`;
+  const target = name ? `${name}` : `${lat},${lng}`;
+  const url = `https://www.google.com/maps/dir/?api=1${originParam}&destination=${encodeURIComponent(target)}&travelmode=walking`;
   if (window.AndroidApp && typeof window.AndroidApp.openExternalUrl === 'function') {
     window.AndroidApp.openExternalUrl(url);
   } else {
@@ -7568,7 +7569,7 @@ function renderHalalListUI() {
           <div style="font-weight:800; font-size:0.95rem; color:#0f172a;">🍽️ ${p.name}</div>
           <div style="font-size:0.75rem; color:#059669; font-weight:700; margin-top:2px;">${p.cuisine}</div>
           <div style="font-size:0.75rem; color:#64748b; margin-top:3px;">📍 ${distFormatted} • ${p.address}</div>
-          <button style="margin-top:8px; width:100%; padding:6px 10px; font-size:0.78rem; font-weight:700; background:#059669; color:#fff; border:none; border-radius:8px; cursor:pointer;" onclick="openHalalDirections(${p.lat}, ${p.lng}, '${safeName}')">
+          <button style="margin-top:8px; width:100%; padding:6px 10px; font-size:0.78rem; font-weight:700; background:#059669; color:#fff; border:none; border-radius:8px; cursor:pointer;" onclick="openHalalDirections(${p.lat}, ${p.lng}, '${safeName}', '${safeAddr}')">
             🧭 Google Maps Directions
           </button>
         </div>
@@ -7630,7 +7631,7 @@ function renderHalalListUI() {
         </div>
 
         <div class="halal-card-actions">
-          <button class="btn-halal-dir" onclick="openHalalDirections(${p.lat}, ${p.lng}, '${safeName}')">
+          <button class="btn-halal-dir" onclick="openHalalDirections(${p.lat}, ${p.lng}, '${safeName}', '${safeAddr}')">
             <span>🧭 Directions</span>
           </button>
           <button class="btn-halal-viewmap" onclick="focusHalalMapMarker(${index})">
@@ -7675,14 +7676,24 @@ function openLiveGoogleMapsHalal() {
 }
 window.openLiveGoogleMapsHalal = openLiveGoogleMapsHalal;
 
-function openHalalDirections(destLat, destLng, destName) {
+function openHalalDirections(destLat, destLng, destName, destAddress) {
   triggerHaptic('milestone');
   const loc = state.userCustomLocation;
   let originParam = "";
   if (loc && loc.lat && loc.lng) {
     originParam = `&origin=${loc.lat},${loc.lng}`;
   }
-  const url = `https://www.google.com/maps/dir/?api=1${originParam}&destination=${destLat},${destLng}&travelmode=walking`;
+  
+  // High-precision destination: Include restaurant name and address so Google Maps specifically targets THIS restaurant
+  let destQuery = destName || '';
+  if (destAddress && destAddress.length > 2) {
+    destQuery = destQuery ? `${destQuery}, ${destAddress}` : destAddress;
+  }
+  if (!destQuery) {
+    destQuery = `${destLat},${destLng}`;
+  }
+
+  const url = `https://www.google.com/maps/dir/?api=1${originParam}&destination=${encodeURIComponent(destQuery)}&travelmode=walking`;
   if (window.AndroidApp && typeof window.AndroidApp.openExternalUrl === 'function') {
     window.AndroidApp.openExternalUrl(url);
   } else {
